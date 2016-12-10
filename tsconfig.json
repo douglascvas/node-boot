@@ -1,0 +1,23 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "sourceMap": true,
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": false,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node"
+  },
+  "filesGlob": [
+    "./src/**/*.ts",
+    "./typings/index.d.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
