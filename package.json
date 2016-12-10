@@ -1,0 +1,26 @@
+{
+  "name": "springify",
+  "version": "1.0.0",
+  "description": "Dependency injection and RESTful api manager for node.JS via typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/douglascvas/springify.git"
+  },
+  "keywords": [
+    "di",
+    "typescript",
+    "dependency",
+    "injection",
+    "ioc"
+  ],
+  "author": "Douglas C. Vasconcelos",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/douglascvas/springify/issues"
+  },
+  "homepage": "https://github.com/douglascvas/springify#readme"
+}
