@@ -37,7 +37,7 @@ function watchTask() {
       compile(file.history, paths.outputMain, {base: `${paths.baseMain}/`});
       compileMain();
     }),
-    watch([`${paths.baseTest}/**/*`], gulp.parallel('be-build:test'))
+    watch([`${paths.baseTest}/**/*`], gulp.parallel('compile:test'))
   ]);
 }
 

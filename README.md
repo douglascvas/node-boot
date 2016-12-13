@@ -110,14 +110,18 @@ It doesn't matter in which order you register them. Just make sure you register 
 
 ## What is the ApplicationManager syntax?
  
-`registerService(classz: Function, name?: string)` - registers a class to be automatically instantiated
-* `classz: any` - Class to be instantiated by springify.
-* `name: string` - Optional name for the instance. If not given, it will be extracted from the class name. PaymentService class will be named 'paymentService', for instance.
+* `registerService(classz: Function, name?: string)` - registers a class to be automatically instantiated
+  * `classz: any` - Class to be instantiated by springify.
+  * `name: string` - Optional name for the instance. If not given, it will be extracted from the class name. PaymentService class will be named *`paymentService`*, for instance.
 
-`registerFactory(name: string|Function, factoryFn: Function, instance?: any)` - registers a function to be used a factory, so to be called to generate an instance for such name
-* `name: string|Function` - The name of the instance that will be produced. If it is a class, the name will be extracted from the class name. 
-* `factoryFn: string` - The function that will be called to construct the instance.
-* `instance` - Optional parameter. This defines the instance from which the factory function will be called. It will be most probably a string, representing the name of the instance, if you want springify to find/instantiate it automatically. Using the example from this page, would be something like `myShop`.
+* `registerFactory(name: string|Function, factoryFn: Function, instance?: any)` - registers a function to be used a factory, so to be called to generate an instance for such name
+  * `name: string|Function` - The name of the instance that will be produced. If it is a class, the name will be extracted from the class name. Example: *`database`*
+  * `factoryFn: string` - The function that will be called to construct the instance. Example: *`MyShop.prototype.databaseFactory`*
+  * `holder` - Optional parameter. This defines the instance from which the factory function will be called (consider it as the *`this`* from the function). It will be most probably a string, representing the name of the instance if you want springify to find/instantiate it automatically. Example: *`myShop`*.
+
+* `registerValue(name: string, value: any)` - registers a value so that springify can use it to inject in other instances.
+  * `name: string` - Name for the value. Whenever springify finds a parameter with this name in the constructor of a class being instantiated, it will inject the value passed as second parameter to this function. 
+  * `value: any` - Value to be registered.
 
 
 ## How do I install?

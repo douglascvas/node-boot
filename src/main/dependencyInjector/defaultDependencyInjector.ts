@@ -57,10 +57,12 @@ export class DefaultDependencyInjector implements DependencyInjector {
    * - classz {function} class to be instantiated.
    * - dependencyValue {*} dependencies to be injected into the class constructor.
    */
-  public async factory(target: any, factoryFn: Function): Promise<boolean> {
+  public async factory(factoryName: string|Function, factoryFn: Function, factoryHolder?: any): Promise<boolean> {
     this.assertIsFunction(factoryFn, 'The factory must be a function.');
 
-    let unit = this.getOrCreateUnit(target, target, factoryFn);
+    let classz: Function = (typeof factoryName === 'string') ? null : <Function>factoryName;
+    let name: string = (typeof factoryName === 'string') ? <string>factoryName : null;
+    let unit = this.getOrCreateUnit(name, classz, factoryFn, factoryHolder);
     this.logger.debug(`Registering factory for ${unit.name}`);
     // unit.instanceValue = factoryFn();
     return this.add(unit);
@@ -93,7 +95,7 @@ export class DefaultDependencyInjector implements DependencyInjector {
       throw new Error(`Some units could not be resolved: ` +
         Array.from(this.units)
           .map(value => value[1])
-          .filter((unit: Unit) => !unit.resolved && !unit.classz)
+          .filter((unit: Unit) => !unit.resolved && this.isUnresolvedUnit(unit))
           .map((unit: Unit) => `"${unit.name}"`)
           .join(',')
       );
@@ -108,6 +110,12 @@ export class DefaultDependencyInjector implements DependencyInjector {
     return this.resolve(unit);
   }
 
+  private setReference(dependencyName: string, unit: Unit) {
+    let dependencyUnit: Unit = this.getOrCreateUnit(dependencyName);
+    dependencyUnit.referencedBy.set(unit.name, unit);
+    return dependencyUnit;
+  }
+
   private async resolve(unit: Unit, resolveQueue: string[] = []): Promise<boolean> {
     const self = this;
     if (unit.resolved) {
@@ -120,18 +128,23 @@ export class DefaultDependencyInjector implements DependencyInjector {
     }
     resolveQueue.push(unit.name);
 
-    // let dependenciesResolved = this.resolveDependencies(unit, self, resolveQueue);
-    if (!unit.classz) {
+    // Unit without classz are those created temporarily by some unit that depends on it.
+    if (this.isUnresolvedUnit(unit)) {
       return false;
     }
 
     let allDependenciesResolved = true;
-    let dependencies = unit.classArgs.map((arg: string) => {
-      let dependencyUnit = self.getOrCreateUnit(arg);
-      dependencyUnit.referencedBy.set(unit.name, unit);
-      allDependenciesResolved = allDependenciesResolved && dependencyUnit.resolved;
-      return dependencyUnit;
-    });
+    let dependencies = unit.classArgs
+      .map((arg: string) => {
+        let dependencyUnit = this.setReference(arg, unit);
+        allDependenciesResolved = allDependenciesResolved && dependencyUnit.resolved;
+        return dependencyUnit;
+      });
+
+    if (typeof unit.factoryHolder === 'string') {
+      let factoryUnit: Unit = this.setReference(unit.factoryHolder, unit);
+      allDependenciesResolved = allDependenciesResolved && factoryUnit.resolved;
+    }
 
     if (!allDependenciesResolved) {
       return false;
@@ -148,27 +161,36 @@ export class DefaultDependencyInjector implements DependencyInjector {
   private async resolveReferences(unit: Unit, resolveQueue: string[] = []): Promise<void> {
     let references = Array.from(unit.referencedBy)
       .map(value => value[1])
-      .map((unit: Unit) => this.resolve(unit, resolveQueue));
+      .map((referencer: Unit) => this.resolve(referencer, resolveQueue));
     await Promise.all(references);
   }
 
-  private getOrCreateUnit(name: string, classz?: Function, factory?: Function): Unit {
+  private getOrCreateUnit(name: string, classz?: Function, factory?: Function, factoryHolder?: any): Unit {
     let unitName: string = this.getInstanceName(classz, name);
-    let classArgs: string[] = (classz ? ObjectUtils.extractArgs(factory || classz) : []);
+    let classArgs: string[] = [];
+    if (factory) {
+      classArgs = ObjectUtils.extractArgs(factory);
+    } else if (classz) {
+      classArgs = ObjectUtils.extractArgs(classz);
+    }
 
     let unit = this.units.get(unitName);
+    if (typeof factoryHolder === 'function') {
+      factoryHolder = this.getInstanceName(factoryHolder);
+    }
     if (unit) {
-      return this.updateUnitData(unit, factory, classz, classArgs);
+      return this.updateUnitData(unit, factory, factoryHolder, classz, classArgs);
     }
     unit = new Unit(unitName, classz, classArgs, factory);
     this.units.set(unitName, unit);
     return unit;
   }
 
-  private updateUnitData(unit: Unit, factory: Function, classz: Function, classArgs: string[]): Unit {
+  private updateUnitData(unit: Unit, factory: Function, factoryHolder: any, classz: Function, classArgs: string[]): Unit {
     unit.factory = unit.factory || factory;
     unit.classz = unit.classz || classz;
     unit.classArgs = unit.classArgs.length ? unit.classArgs : classArgs;
+    unit.factoryHolder = factoryHolder;
     return unit;
   }
 
@@ -180,7 +202,7 @@ export class DefaultDependencyInjector implements DependencyInjector {
       }
       name = ObjectUtils.toInstanceName(className);
     }
-    return this.translateName(name);
+    return this.translateName(ObjectUtils.toInstanceName(name));
   }
 
   private getUnitsWithResolvedStatusAs(status: boolean): Unit[] {
@@ -205,13 +227,18 @@ export class DefaultDependencyInjector implements DependencyInjector {
     return new (Function.prototype.bind.apply(classz, [classz].concat(dependencies)));
   }
 
+  private isUnresolvedUnit(unit: Unit): boolean {
+    return !unit.classz && !unit.factory && !unit.resolved;
+  }
+
   private async instantiate(unit: Unit, dependencies: Unit[]): Promise<boolean> {
-    if (!unit.classz) {
+    if (this.isUnresolvedUnit(unit)) {
       return false;
     }
     let dependencyValues = dependencies.map(dependency => dependency.instanceValue);
     if (unit.factory) {
-      unit.instanceValue = await unit.factory.apply(null, dependencyValues);
+      let factoryHolder = (typeof unit.factoryHolder === 'string') ? this.getOrCreateUnit(unit.factoryHolder).instanceValue : unit.factoryHolder || null;
+      unit.instanceValue = await unit.factory.apply(factoryHolder, dependencyValues);
     } else {
       unit.instanceValue = this.defaultFactory(unit.classz, dependencyValues);
     }

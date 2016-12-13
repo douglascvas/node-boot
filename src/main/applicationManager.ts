@@ -35,8 +35,8 @@ export class ApplicationManager {
     return this.dependencyInjector.service(service, name);
   }
 
-  public registerFactory(target: any, factoryFn: Function): Promise<boolean> {
-    return this.dependencyInjector.factory(target, factoryFn);
+  public registerFactory(name: string|Function, factoryFn: Function, holder?: any): Promise<boolean> {
+    return this.dependencyInjector.factory(name, factoryFn, holder);
   }
 
   public async bootstrap(): Promise<any> {
