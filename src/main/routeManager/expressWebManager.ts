@@ -1,14 +1,16 @@
 import {EndpointInfo} from "../decorator/mvc";
-import {RouteManager} from "./routeManager";
 import {Logger, LoggerFactory} from "../loggerFactory";
+import {WebManager} from "./webManager";
 
-export class ExpressRouterManager implements RouteManager {
+export class ExpressWebManager implements WebManager {
   private logger: Logger;
+  private router: any;
 
-  constructor(private expressRouter: any, private loggerFactory?: LoggerFactory) {
+  constructor(private expressApp: any, private loggerFactory?: LoggerFactory) {
     if (loggerFactory) {
-      this.logger = loggerFactory.getLogger(ExpressRouterManager);
+      this.logger = loggerFactory.getLogger(ExpressWebManager);
     }
+    this.router = expressApp.Router();
   }
 
   public registerApi(endpointInfo: EndpointInfo, classInstance: any) {
@@ -16,6 +18,6 @@ export class ExpressRouterManager implements RouteManager {
     if (this.logger) {
       this.logger.debug(`Registering api - ${method.toUpperCase()} ${endpointInfo.path}.`);
     }
-    this.expressRouter[method](endpointInfo.path, endpointInfo.callback.bind(classInstance));
+    this.router[method](endpointInfo.path, endpointInfo.callback.bind(classInstance));
   }
 }

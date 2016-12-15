@@ -1,5 +1,5 @@
 {
-  "name": "springify",
+  "name": "node-boot",
   "version": false,
   "globalDependencies": {
     "chai": "registry:dt/chai#3.4.0+20160601211834",

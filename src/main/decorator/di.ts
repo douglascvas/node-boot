@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-const producesMetadataKey = Symbol("producesMD");
+const factoryMetadataKey = Symbol("factoryMD");
 const servicesMetadataKey = Symbol("servicesMD");
 const autoscanMetadataKey = Symbol("autoScanMD");
 
@@ -19,31 +19,31 @@ export interface AutoScanInfo {
   excludePaths: string[]
 }
 
-export function Produces(name: any) {
+export function Factory(name: any) {
   return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-    let producers: FactoryInfo[] = Reflect.getMetadata(producesMetadataKey, target) || [];
+    let producers: FactoryInfo[] = Reflect.getMetadata(factoryMetadataKey, target) || [];
     producers.push({name: name, factory: descriptor.value});
-    Reflect.defineMetadata(producesMetadataKey, producers, target);
+    Reflect.defineMetadata(factoryMetadataKey, producers, target);
   }
 }
 
 /**
  */
-export function Named(name?: any): any {
-  function defineNamed(target: any) {
+export function Service(name?: any): any {
+  function defineService(target: any) {
     let services: ServiceInfo[] = Reflect.getMetadata(servicesMetadataKey, target) || [];
     services.push({name: name, classz: target});
     Reflect.defineMetadata(servicesMetadataKey, services, target)
   }
 
   if (name && typeof name === 'string') {
-    return defineNamed;
+    return defineService;
   }
 
   // No parameter
   let target = name;
   name = null;
-  defineNamed(target);
+  defineService(target);
   return target;
 }
 
@@ -77,7 +77,7 @@ export class DI {
   }
 
   public static getDeclaredFactories(target: any): FactoryInfo[] {
-    return getMetadata(producesMetadataKey, target, []);
+    return getMetadata(factoryMetadataKey, target, []);
   }
 
 }

@@ -3,16 +3,16 @@
 import * as sinon from "sinon";
 import * as chai from "chai";
 import {ApplicationManager} from "../main/applicationManager";
-import {RouteManager} from "../main/routeManager/routeManager";
 import {ModuleScannerService, ClassInfo} from "../main/moduleScanner/moduleScannerService";
 import {LoggerFactory, Logger} from "../main/loggerFactory";
 import {DependencyInjector} from "../main/dependencyInjector/dependencyInjector";
-import {ExpressRouterManager} from "../main/routeManager/expressRouteManager";
 import {DefaultModuleScannerService} from "../main/moduleScanner/defaultModuleScannerService";
 import {DefaultDependencyInjector} from "../main/dependencyInjector/defaultDependencyInjector";
 import {RequestType, EndpointInfo, ResponseBody, RequestMapping} from "../main/decorator/mvc";
 import {Optional} from "../main/optional";
-import {AutoScan, Produces, Named} from "../main/decorator/di";
+import {AutoScan, Factory, Service} from "../main/decorator/di";
+import {WebManager} from "../main/routeManager/webManager";
+import {ExpressWebManager} from "../main/routeManager/expressWebManager";
 import SinonSpy = Sinon.SinonSpy;
 import SinonStub = Sinon.SinonStub;
 
@@ -21,7 +21,7 @@ const assert = chai.assert;
 describe('ApplicationManager', function () {
 
   let appManager: ApplicationManager;
-  let routeManager: RouteManager;
+  let webManager: WebManager;
   let moduleScannerService: ModuleScannerService;
   let loggerFactory: LoggerFactory;
   let dependencyInjector: DependencyInjector;
@@ -38,17 +38,17 @@ describe('ApplicationManager', function () {
   }
 
   beforeEach(() => {
-    routeManager = <any>sinon.createStubInstance(ExpressRouterManager);
+    webManager = <any>sinon.createStubInstance(ExpressWebManager);
     moduleScannerService = <any>sinon.createStubInstance(DefaultModuleScannerService);
     dependencyInjector = <any>sinon.createStubInstance(DefaultDependencyInjector);
     loggerFactory = <any>sinon.createStubInstance(LoggerFactory);
     (<SinonStub>loggerFactory.getLogger).returns(sinon.createStubInstance(Logger));
     byClassInstance = new ByClass();
-    appManager = new ApplicationManager(TestClassMain, routeManager, loggerFactory, dependencyInjector, moduleScannerService);
+    appManager = new ApplicationManager(TestClassMain, webManager, loggerFactory, dependencyInjector, moduleScannerService);
   });
 
   describe('#bootstrap()', function () {
-    it('should register classes annotated with @Named', async function () {
+    it('should register classes annotated with @Service', async function () {
       // given
       dependencyInjectorIsEmpty();
       dependencyInjectorHasMainClassAsService();
@@ -62,7 +62,7 @@ describe('ApplicationManager', function () {
       assertServiceIsRegistered(DependencyWithNameFromString, 'byString');
     });
 
-    it('should not register classes that are not annotated with @Named', async function () {
+    it('should not register classes that are not annotated with @Service', async function () {
       // given
       dependencyInjectorIsEmpty();
       dependencyInjectorHasMainClassAsService();
@@ -72,7 +72,7 @@ describe('ApplicationManager', function () {
       await appManager.bootstrap();
 
       // then
-      assertServiceIsNotRegistered(DependencyClassNotNamed);
+      assertServiceIsNotRegistered(DependencyClassNotService);
     });
 
     it('should register functions annotated with @Producer as factories', async function () {
@@ -167,7 +167,7 @@ describe('ApplicationManager', function () {
       {name: 'TestClassMain', classz: TestClassMain},
       {name: 'ByClass', classz: ByClass},
       {name: 'DependencyWithNameFromString', classz: DependencyWithNameFromString},
-      {name: 'DependencyClassNotNamed', classz: DependencyClassNotNamed}
+      {name: 'DependencyClassNotService', classz: DependencyClassNotService}
     ];
   }
 
@@ -176,7 +176,7 @@ describe('ApplicationManager', function () {
   }
 
   function assertApiIsRegistered(endpointInfo: EndpointInfo, instance: any) {
-    assert.isTrue((<SinonStub>routeManager.registerApi).calledWith(endpointInfo, instance));
+    assert.isTrue((<SinonStub>webManager.registerApi).calledWith(endpointInfo, instance));
   }
 
   function assertAllDependenciesWhereChecked() {
@@ -212,13 +212,13 @@ describe('ApplicationManager', function () {
 
   @AutoScan(['i-path/'], ['e-path/'])
   class TestClassMain {
-    @Produces('byFactory')
+    @Factory('byFactory')
     public create(): any {
       return 10;
     }
   }
 
-  @Named
+  @Service
   class ByClass {
     @ResponseBody
     @RequestMapping('/testApi-1', RequestType.GET)
@@ -232,11 +232,11 @@ describe('ApplicationManager', function () {
     }
   }
 
-  @Named('byString')
+  @Service('byString')
   class DependencyWithNameFromString {
   }
 
-  class DependencyClassNotNamed {
+  class DependencyClassNotService {
   }
 
 });

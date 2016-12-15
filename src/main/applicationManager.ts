@@ -2,13 +2,13 @@ import "reflect-metadata";
 import {DI, ServiceInfo, FactoryInfo, AutoScanInfo} from "./decorator/di";
 import {DefaultDependencyInjector} from "./dependencyInjector/defaultDependencyInjector";
 import {MVC, EndpointInfo} from "./decorator/mvc";
-import {RouteManager} from "./routeManager/routeManager";
 import {ModuleScannerService, ClassInfo} from "./moduleScanner/moduleScannerService";
 import {DefaultModuleScannerService} from "./moduleScanner/defaultModuleScannerService";
 import {DependencyInjector} from "./dependencyInjector/dependencyInjector";
 import {Logger, LoggerFactory} from "./loggerFactory";
 import {ObjectUtils} from "./objectUtils";
 import * as sourceMapSupport from "source-map-support";
+import {WebManager} from "./routeManager/webManager";
 
 sourceMapSupport.install();
 
@@ -16,7 +16,7 @@ export class ApplicationManager {
   private logger: Logger;
 
   constructor(private mainApplicationClass: any,
-              private routeManager?: RouteManager,
+              private webManager?: WebManager,
               private loggerFactory?: LoggerFactory,
               private dependencyInjector?: DependencyInjector,
               private moduleScannerService?: ModuleScannerService) {
@@ -76,11 +76,14 @@ export class ApplicationManager {
 
   private registerEndpoints() {
     let self = this;
+    if (!this.webManager) {
+      throw new Error('No webmanager configured. Make sure you have given a webManager instance to the applicationManager constructor.');
+    }
     this.dependencyInjector.findAll()
       .filter(unit => unit.classz)
       .forEach(unit => {
         let endpointsInfo: EndpointInfo[] = MVC.getEndpoints(unit.classz);
-        endpointsInfo.forEach(endpointInfo => self.routeManager.registerApi(endpointInfo, unit.value));
+        endpointsInfo.forEach(endpointInfo => self.webManager.registerApi(endpointInfo, unit.value));
       });
   }
 

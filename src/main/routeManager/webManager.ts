@@ -1,5 +1,5 @@
 import {EndpointInfo} from "../decorator/mvc";
 
-export interface RouteManager {
+export interface WebManager {
   registerApi(endpointInfo: EndpointInfo, classInstance: any);
 }

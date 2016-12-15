@@ -161,10 +161,44 @@ describe('DefaultDependencyInjector', function () {
       assert.isTrue(!!foo.get().rocket);
       assert.equal(foo.get().rocket.id, "space rocket");
     });
+
+    it('should register a factory setting the right context registered by name', async function () {
+      // given
+      await dependencyInjector.factory('planet', Rocket.prototype.factoryFn, 'rocket');
+      await dependencyInjector.service(Rocket);
+      await dependencyInjector.service(Foo);
+
+      // when
+      let planet: Optional<any> = dependencyInjector.findOne('planet');
+
+      // then
+      assert.isTrue(planet.isPresent());
+      assert.equal(planet.get().fooId, FOO_ID);
+      assert.equal(planet.get().rocketId, ROCKET_ID);
+    });
+
+    it('should register a factory setting the right context registered by class', async function () {
+      // given
+      await dependencyInjector.factory('planet', Rocket.prototype.factoryFn, Rocket);
+      await dependencyInjector.service(Rocket);
+      await dependencyInjector.service(Foo);
+
+      // when
+      let planet: Optional<any> = dependencyInjector.findOne('planet');
+
+      // then
+      assert.isTrue(planet.isPresent());
+      assert.equal(planet.get().fooId, FOO_ID);
+      assert.equal(planet.get().rocketId, ROCKET_ID);
+    });
   });
 
   class Rocket {
     id: any = ROCKET_ID;
+
+    public factoryFn(foo: Foo) {
+      return {fooId: foo.id, rocketId: this.id};
+    };
   }
 
   class Foo {
@@ -179,5 +213,8 @@ describe('DefaultDependencyInjector', function () {
     }
   }
 
+  process.on('unhandledRejection', (reason) => {
+    console.log('Reason: ', reason);
+  });
 
 });

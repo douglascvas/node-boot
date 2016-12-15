@@ -11,7 +11,7 @@ export class Unit {
               public classz: Function,
               public classArgs: string[],
               public factory?: Function,
-              public factoryHolder?: any) {
+              public factoryContext?: any) {
     this.classArgs = classArgs || [];
     this.referencedBy = new Map();
     this.resolved = false;
@@ -29,7 +29,7 @@ export interface DependencyInjector {
   assertAllResolved(): void;
   value(name: string, value: any): Promise<void>;
   service(classz: any, name?: string): Promise<boolean>;
-  factory(name: string|Function, factoryFn?: Function, factoryHolder?: any): Promise<boolean>;
+  factory(name: string|Function, factoryFn?: Function, factoryContext?: any): Promise<boolean>;
   findOne(name: any): Optional<any>;
   findAll(): UnitInfo[];
   assertAllResolved(): void;

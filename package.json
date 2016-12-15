@@ -1,5 +1,5 @@
 {
-  "name": "springify",
+  "name": "node-boot",
   "version": "1.0.0",
   "description": "Dependency injection and RESTful api manager for node.JS via typescript",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/douglascvas/springify.git"
+    "url": "git+https://github.com/douglascvas/node-boot.git"
   },
   "keywords": [
     "di",
@@ -20,9 +20,9 @@
   "author": "Douglas C. Vasconcelos",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/douglascvas/springify/issues"
+    "url": "https://github.com/douglascvas/node-boot/issues"
   },
-  "homepage": "https://github.com/douglascvas/springify#readme",
+  "homepage": "https://github.com/douglascvas/node-boot#readme",
   "dependencies": {
     "glob": "^7.1.1",
     "log4js": "^1.0.1",
