@@ -7,8 +7,8 @@ import {DefaultModuleScannerService} from "./moduleScanner/defaultModuleScannerS
 import {DependencyInjector} from "./dependencyInjector/dependencyInjector";
 import {Logger, LoggerFactory} from "./loggerFactory";
 import {ObjectUtils} from "./objectUtils";
+import {WebManager} from "./webManager/webManager";
 import * as sourceMapSupport from "source-map-support";
-import {WebManager} from "./routeManager/webManager";
 
 sourceMapSupport.install();
 

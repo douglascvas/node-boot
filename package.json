@@ -2,9 +2,9 @@
   "name": "node-boot",
   "version": "1.0.0",
   "description": "Dependency injection and RESTful api manager for node.JS via typescript",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "mocha ."
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",

@@ -1,12 +1,12 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "rootDir": ".",
-    "outDir": "build",
+    "rootDir": "src",
+    "outDir": "lib",
     "sourceMap": true,
     "target": "es2015",
     "module": "commonjs",
-    "declaration": false,
+    "declaration": true,
     "noImplicitAny": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,

@@ -5,6 +5,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const mocha = require('gulp-mocha');
 const watch = require('gulp-watch');
 const gulp = require('gulp');
+const path = require('path');
 
 function cleanMain() {
   return del(paths.outputMain);
@@ -18,12 +19,16 @@ function compileMain() {
   return compile(paths.source, paths.output);
 }
 
+function compileIndex() {
+  return compile('src/index.ts', paths.output);
+}
+
 function compileTest() {
   return compile(paths.test, paths.output);
 }
 
 function unitTest(cb) {
-  gulp.src('build/test/**/*.unittest.js', {read: false})
+  gulp.src('lib/test/**/*.unittest.js', {read: false})
     .pipe(mocha())
     .once('end', () => {
       cb();
@@ -65,6 +70,6 @@ gulp.task('clean:main', cleanMain);
 gulp.task('clean:test', cleanTest);
 gulp.task('compile:main', compileMain);
 gulp.task('compile:test', compileTest);
-gulp.task('build', gulp.parallel('compile:main', 'compile:test'));
+gulp.task('build', gulp.parallel('compile:main', 'compile:test', compileIndex));
 gulp.task('test', gulp.series('build', unitTest));
 gulp.task('watch', gulp.series('build', watchTask));

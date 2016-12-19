@@ -1,7 +1,7 @@
 const path = require('path');
 
 const srcRoot = absolutePath('src/');
-const outputRoot = absolutePath('build/');
+const outputRoot = absolutePath('lib/');
 const mainRoot = `${srcRoot}/main`;
 const resourceRoot = `${srcRoot}/resource`;
 const testRoot = `${srcRoot}/test`;

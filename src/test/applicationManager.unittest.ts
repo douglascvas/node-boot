@@ -11,8 +11,8 @@ import {DefaultDependencyInjector} from "../main/dependencyInjector/defaultDepen
 import {RequestType, EndpointInfo, ResponseBody, RequestMapping} from "../main/decorator/mvc";
 import {Optional} from "../main/optional";
 import {AutoScan, Factory, Service} from "../main/decorator/di";
-import {WebManager} from "../main/routeManager/webManager";
-import {ExpressWebManager} from "../main/routeManager/expressWebManager";
+import {WebManager} from "../main/webManager/webManager";
+import {ExpressWebManager} from "../main/webManager/expressWebManager";
 import SinonSpy = Sinon.SinonSpy;
 import SinonStub = Sinon.SinonStub;
 

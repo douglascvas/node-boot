@@ -4,7 +4,7 @@ import * as sinon from "sinon";
 import * as chai from "chai";
 import {LoggerFactory, Logger} from "../../main/loggerFactory";
 import {EndpointInfo, RequestType} from "../../main/decorator/mvc";
-import {ExpressWebManager} from "../../main/routeManager/expressWebManager";
+import {ExpressWebManager} from "../../main/webManager/expressWebManager";
 import SinonSpy = Sinon.SinonSpy;
 import SinonStub = Sinon.SinonStub;
 
