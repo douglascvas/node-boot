@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Dependency injection and RESTful api manager for node.JS via typescript",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/"
+  ],
   "scripts": {
     "test": "gulp test"
   },
