@@ -135,7 +135,7 @@ Simple:
 ```
 npm install node-boot --save
  
-typings install node-boot=github:douglascvas/node-boot/lib/index.d.ts --global
+typings install node-boot=github:douglascvas/node-boot/index.d.ts --global
 ```
 
 
