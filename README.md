@@ -31,7 +31,7 @@ export class PaymentController {
   constructor(private paymentService: PaymentService){
   }
   
-  @RequestBody
+  @ResponseBody
   @RequestMapping('/payment', RequestType.POST)
   public paymentApi(request, response): Payment {
     this.paymentService.pay();
