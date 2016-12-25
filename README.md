@@ -134,8 +134,6 @@ This is the bridge between your application and node-boot.
 Simple:
 ```
 npm install node-boot --save
- 
-typings install node-boot=github:douglascvas/node-boot/index.d.ts --global
 ```
 
 
