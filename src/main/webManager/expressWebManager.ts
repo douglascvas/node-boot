@@ -10,7 +10,7 @@ export class ExpressWebManager implements WebManager {
     if (loggerFactory) {
       this.logger = loggerFactory.getLogger(ExpressWebManager);
     }
-    this.router = expressApp.Router();
+    this.router = expressApp.route();
   }
 
   public registerApi(endpointInfo: EndpointInfo, classInstance: any) {

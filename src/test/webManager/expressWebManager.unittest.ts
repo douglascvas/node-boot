@@ -20,7 +20,7 @@ describe('ExpressWebManager', function () {
   beforeEach(() => {
     expressRouter = {get: sinon.stub(), post: sinon.stub()};
     expressApp = {
-      Router: function () {
+      route: function () {
         return expressRouter;
       }
     };
