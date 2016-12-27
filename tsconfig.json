@@ -13,9 +13,6 @@
     "experimentalDecorators": true,
     "moduleResolution": "node"
   },
-  "files": [
-    "./src/index.ts"
-  ],
   "filesGlob": [
     "./src/**/*.ts",
     "./typings/index.d.ts"

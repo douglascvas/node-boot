@@ -13,17 +13,11 @@ const assert = chai.assert;
 describe('ExpressWebManager', function () {
 
   let expressApp: any;
-  let expressRouter: any;
   let loggerFactory: LoggerFactory;
   let expressWebManager: ExpressWebManager;
 
   beforeEach(() => {
-    expressRouter = {get: sinon.stub(), post: sinon.stub()};
-    expressApp = {
-      route: function () {
-        return expressRouter;
-      }
-    };
+    expressApp = {get: sinon.stub(), post: sinon.stub()};
     loggerFactory = <any>sinon.createStubInstance(LoggerFactory);
     (<SinonStub>loggerFactory.getLogger).returns(sinon.createStubInstance(Logger));
     expressWebManager = new ExpressWebManager(expressApp, loggerFactory);
@@ -41,8 +35,8 @@ describe('ExpressWebManager', function () {
       await expressWebManager.registerApi(endpointInfo, obj);
 
       // then
-      assert.isTrue(expressRouter.get.calledWith(API_PATH, sinon.match.any));
-      const callbackUsed: SinonSpy = expressRouter.get.args[0][1];
+      assert.isTrue(expressApp.get.calledWith(API_PATH, sinon.match.any));
+      const callbackUsed: SinonSpy = expressApp.get.args[0][1];
       assert.equal(callback.callCount, 0);
       callbackUsed();
       assert.equal(callback.callCount, 1);
@@ -59,8 +53,8 @@ describe('ExpressWebManager', function () {
       await expressWebManager.registerApi(endpointInfo, obj);
 
       // then
-      assert.isTrue(expressRouter.post.calledWith(API_PATH, sinon.match.any));
-      const callbackUsed: SinonSpy = expressRouter.post.args[0][1];
+      assert.isTrue(expressApp.post.calledWith(API_PATH, sinon.match.any));
+      const callbackUsed: SinonSpy = expressApp.post.args[0][1];
       assert.equal(callback.callCount, 0);
       callbackUsed();
       assert.equal(callback.callCount, 1);
