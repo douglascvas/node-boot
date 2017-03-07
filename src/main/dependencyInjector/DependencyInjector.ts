@@ -1,6 +1,6 @@
 'use strict';
 
-import {Optional} from "../optional";
+import {Optional} from "../Optional";
 
 export class Unit {
   public resolved: boolean;

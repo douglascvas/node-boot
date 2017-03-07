@@ -56,7 +56,7 @@ Tells the application to scan all the files that match the glob pattern passed a
 In the example node-boot will load all the javascript files, recursively, that are located in the current directory. Notice that it will scan **.js** files, and not **ts**, as our source code will be transpiled from typescript to javascript, right?
 
 Syntax:
-`@RequestMapping(includePaths, excludePaths)`
+`@AutoScan(includePaths, excludePaths)`
 * `includePaths: string|Array<string>` - Glob syntax used to match the files to load.
 * `excludePaths: string|Array<string>` - Glob syntax used to match the files to **not** load.
 

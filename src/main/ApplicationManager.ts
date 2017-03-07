@@ -1,14 +1,16 @@
 import "reflect-metadata";
-import {DI, ServiceInfo, FactoryInfo, AutoScanInfo} from "./decorator/di";
-import {DefaultDependencyInjector} from "./dependencyInjector/defaultDependencyInjector";
-import {MVC, EndpointInfo} from "./decorator/mvc";
-import {ModuleScannerService, ClassInfo} from "./moduleScanner/moduleScannerService";
-import {DefaultModuleScannerService} from "./moduleScanner/defaultModuleScannerService";
-import {DependencyInjector} from "./dependencyInjector/dependencyInjector";
-import {Logger, LoggerFactory} from "./loggerFactory";
-import {ObjectUtils} from "./objectUtils";
-import {WebManager} from "./webManager/webManager";
+import {DI, ServiceInfo, FactoryInfo, AutoScanInfo} from "./decorator/Di";
+import {DefaultDependencyInjector} from "./dependencyInjector/DefaultDependencyInjector";
+import {MVC, EndpointInfo} from "./decorator/Mvc";
+import {ModuleScannerService, ClassInfo} from "./moduleScanner/ModuleScannerService";
+import {DefaultModuleScannerService} from "./moduleScanner/DefaultModuleScannerService";
+import {DependencyInjector} from "./dependencyInjector/DependencyInjector";
+import {LoggerFactory} from "./LoggerFactory";
+import {ObjectUtils} from "./ObjectUtils";
+import {WebManager} from "./webManager/WebManager";
 import * as sourceMapSupport from "source-map-support";
+import {Logger} from "./Logger";
+import {ConsoleLoggerFactory} from "./ConsoleLoggerFactory";
 
 sourceMapSupport.install();
 
@@ -20,7 +22,7 @@ export class ApplicationManager {
               private loggerFactory?: LoggerFactory,
               private dependencyInjector?: DependencyInjector,
               private moduleScannerService?: ModuleScannerService) {
-    this.loggerFactory = loggerFactory || new LoggerFactory();
+    this.loggerFactory = loggerFactory || new ConsoleLoggerFactory();
     this.logger = loggerFactory.getLogger('dependencyInjector');
     this.dependencyInjector = dependencyInjector || new DefaultDependencyInjector(loggerFactory);
     this.moduleScannerService = moduleScannerService || new DefaultModuleScannerService();

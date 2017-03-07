@@ -1,6 +1,7 @@
-import {EndpointInfo} from "../decorator/mvc";
-import {Logger, LoggerFactory} from "../loggerFactory";
-import {WebManager} from "./webManager";
+import {EndpointInfo} from "../decorator/Mvc";
+import {LoggerFactory} from "../LoggerFactory";
+import {WebManager} from "./WebManager";
+import {Logger} from "../Logger";
 
 export class ExpressWebManager implements WebManager {
   private logger: Logger;

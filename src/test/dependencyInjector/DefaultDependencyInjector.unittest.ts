@@ -1,12 +1,10 @@
 'use strict';
 
-import * as sinon from "sinon";
 import * as chai from "chai";
-import SinonSpy = Sinon.SinonSpy;
-import SinonStub = Sinon.SinonStub;
-import {LoggerFactory, Logger} from "../../main/loggerFactory";
-import {DefaultDependencyInjector} from "../../main/dependencyInjector/defaultDependencyInjector";
-import {Optional} from "../../main/optional";
+import {LoggerFactory} from "../../main/LoggerFactory";
+import {DefaultDependencyInjector} from "../../main/dependencyInjector/DefaultDependencyInjector";
+import {Optional} from "../../main/Optional";
+import {TestLoggerFactory} from "../TestLoggerFactory";
 
 const assert = chai.assert;
 
@@ -19,8 +17,7 @@ describe('DefaultDependencyInjector', function () {
   const ROCKET_ID = 'rocketId';
 
   beforeEach(() => {
-    loggerFactory = <any>sinon.createStubInstance(LoggerFactory);
-    (<SinonStub>loggerFactory.getLogger).returns(sinon.createStubInstance(Logger));
+    loggerFactory = new TestLoggerFactory();
     dependencyInjector = new DefaultDependencyInjector(loggerFactory);
   });
 

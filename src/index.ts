@@ -1,15 +1,15 @@
-export * from "./main/decorator/mvc";
-export * from "./main/decorator/di";
-export * from "./main/loggerFactory";
-export * from "./main/optional";
-export * from "./main/objectUtils";
-export * from "./main/applicationManager";
+export * from "./main/decorator/Mvc";
+export * from "./main/decorator/Di";
+export * from "./main/LoggerFactory";
+export * from "./main/Optional";
+export * from "./main/ObjectUtils";
+export * from "./main/ApplicationManager";
 
-export * from "./main/webManager/webManager";
-export * from "./main/webManager/expressWebManager";
+export * from "./main/webManager/WebManager";
+export * from "./main/webManager/ExpressWebManager";
 
-export * from "./main/moduleScanner/moduleScannerService";
-export * from "./main/moduleScanner/defaultModuleScannerService";
+export * from "./main/moduleScanner/ModuleScannerService";
+export * from "./main/moduleScanner/DefaultModuleScannerService";
 
-export * from "./main/dependencyInjector/dependencyInjector";
-export * from "./main/dependencyInjector/defaultDependencyInjector";
+export * from "./main/dependencyInjector/DependencyInjector";
+export * from "./main/dependencyInjector/DefaultDependencyInjector";

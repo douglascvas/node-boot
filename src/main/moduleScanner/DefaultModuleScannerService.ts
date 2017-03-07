@@ -2,8 +2,8 @@
 
 import * as glob from "glob";
 import * as path from "path";
-import {ModuleScannerService, ClassInfo} from "./moduleScannerService";
-import {ObjectUtils} from "../objectUtils";
+import {ModuleScannerService, ClassInfo} from "./ModuleScannerService";
+import {ObjectUtils} from "../ObjectUtils";
 
 export class DefaultModuleScannerService implements ModuleScannerService {
 

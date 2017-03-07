@@ -1,8 +1,9 @@
 'use strict';
-import {DependencyInjector, Unit, UnitInfo} from "./dependencyInjector";
-import {LoggerFactory} from "../loggerFactory";
-import {Optional} from "../optional";
-import {ObjectUtils} from "../objectUtils";
+import {DependencyInjector, Unit, UnitInfo} from "./DependencyInjector";
+import {LoggerFactory} from "../LoggerFactory";
+import {Optional} from "../Optional";
+import {ObjectUtils} from "../ObjectUtils";
+import {ConsoleLoggerFactory} from "../ConsoleLoggerFactory";
 
 export class DefaultDependencyInjector implements DependencyInjector {
   private translationMap: Map<string,string>;
@@ -10,7 +11,7 @@ export class DefaultDependencyInjector implements DependencyInjector {
   private units: Map<string, Unit>;
 
   constructor(private loggerFactory?: LoggerFactory) {
-    this.loggerFactory = loggerFactory || new LoggerFactory();
+    this.loggerFactory = loggerFactory || new ConsoleLoggerFactory();
     this.logger = loggerFactory.getLogger('dependencyInjector');
     this.translationMap = new Map();
     this.units = new Map();

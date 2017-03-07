@@ -1,18 +1,19 @@
 'use strict';
 
-import * as sinon from "sinon";
+import * as Sinon from "sinon";
 import * as chai from "chai";
-import {ApplicationManager} from "../main/applicationManager";
-import {ModuleScannerService, ClassInfo} from "../main/moduleScanner/moduleScannerService";
-import {LoggerFactory, Logger} from "../main/loggerFactory";
-import {DependencyInjector} from "../main/dependencyInjector/dependencyInjector";
-import {DefaultModuleScannerService} from "../main/moduleScanner/defaultModuleScannerService";
-import {DefaultDependencyInjector} from "../main/dependencyInjector/defaultDependencyInjector";
-import {RequestType, EndpointInfo, ResponseBody, RequestMapping} from "../main/decorator/mvc";
-import {Optional} from "../main/optional";
-import {AutoScan, Factory, Service} from "../main/decorator/di";
-import {WebManager} from "../main/webManager/webManager";
-import {ExpressWebManager} from "../main/webManager/expressWebManager";
+import {ApplicationManager} from "../main/ApplicationManager";
+import {ModuleScannerService, ClassInfo} from "../main/moduleScanner/ModuleScannerService";
+import {LoggerFactory} from "../main/LoggerFactory";
+import {DependencyInjector} from "../main/dependencyInjector/DependencyInjector";
+import {DefaultModuleScannerService} from "../main/moduleScanner/DefaultModuleScannerService";
+import {DefaultDependencyInjector} from "../main/dependencyInjector/DefaultDependencyInjector";
+import {RequestType, EndpointInfo, ResponseBody, RequestMapping} from "../main/decorator/Mvc";
+import {Optional} from "../main/Optional";
+import {AutoScan, Factory, Service} from "../main/decorator/Di";
+import {WebManager} from "../main/webManager/WebManager";
+import {ExpressWebManager} from "../main/webManager/ExpressWebManager";
+import {TestLoggerFactory} from "./TestLoggerFactory";
 import SinonSpy = Sinon.SinonSpy;
 import SinonStub = Sinon.SinonStub;
 
@@ -30,19 +31,18 @@ describe('ApplicationManager', function () {
 
 
   function spy() {
-    return sinon.spy();
+    return Sinon.spy();
   }
 
   function stub() {
-    return sinon.stub();
+    return Sinon.stub();
   }
 
   beforeEach(() => {
-    webManager = <any>sinon.createStubInstance(ExpressWebManager);
-    moduleScannerService = <any>sinon.createStubInstance(DefaultModuleScannerService);
-    dependencyInjector = <any>sinon.createStubInstance(DefaultDependencyInjector);
-    loggerFactory = <any>sinon.createStubInstance(LoggerFactory);
-    (<SinonStub>loggerFactory.getLogger).returns(sinon.createStubInstance(Logger));
+    webManager = Sinon.createStubInstance(ExpressWebManager);
+    moduleScannerService = Sinon.createStubInstance(DefaultModuleScannerService);
+    dependencyInjector = Sinon.createStubInstance(DefaultDependencyInjector);
+    loggerFactory = new TestLoggerFactory();
     byClassInstance = new ByClass();
     appManager = new ApplicationManager(TestClassMain, webManager, loggerFactory, dependencyInjector, moduleScannerService);
   });
@@ -114,7 +114,7 @@ describe('ApplicationManager', function () {
       assertApiIsRegistered({
         path: '/testApi-1',
         type: RequestType.GET,
-        callback: <any>sinon.match.any
+        callback: <any>Sinon.match.any
       }, byClassInstance);
 
       assertApiIsRegistered({
@@ -129,7 +129,7 @@ describe('ApplicationManager', function () {
   describe('#registerFactory()', function () {
     it('should register a factory', async function () {
       // given
-      let factoryFn = sinon.stub();
+      let factoryFn = Sinon.stub();
 
       // when
       await appManager.registerFactory(UNIT_NAME, factoryFn);
@@ -141,7 +141,7 @@ describe('ApplicationManager', function () {
   describe('#registerService()', async function () {
     it('should register a service', async function () {
       // given
-      let service = sinon.stub();
+      let service = Sinon.stub();
 
       // when
       await appManager.registerService(service, UNIT_NAME);
@@ -153,7 +153,7 @@ describe('ApplicationManager', function () {
   describe('#registerValue()', async function () {
     it('should register a value', async function () {
       // given
-      let value = sinon.stub();
+      let value = Sinon.stub();
 
       // when
       await appManager.registerValue(UNIT_NAME, value);

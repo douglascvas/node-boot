@@ -11,20 +11,12 @@ function cleanMain() {
   return del(paths.outputMain);
 }
 
-function cleanTest() {
-  return del(paths.outputTest);
-}
-
 function compileMain() {
   return compile(paths.source, paths.output);
 }
 
 function compileIndex() {
   return compile('src/index.ts', paths.output);
-}
-
-function compileTest() {
-  return compile(paths.test, paths.output);
 }
 
 function unitTest(cb) {
@@ -66,10 +58,7 @@ process.on('unhandledRejection', (e) => {
   console.trace('Error: ', e);
 });
 
-gulp.task('clean:main', cleanMain);
-gulp.task('clean:test', cleanTest);
-gulp.task('compile:main', compileMain);
-gulp.task('compile:test', compileTest);
-gulp.task('build', gulp.parallel('compile:main', 'compile:test', compileIndex));
-gulp.task('test', gulp.series('build', unitTest));
+gulp.task('clean', cleanMain);
+gulp.task('compile', compileMain);
+gulp.task('build', gulp.parallel('compile', compileIndex));
 gulp.task('watch', gulp.series('build', watchTask));
