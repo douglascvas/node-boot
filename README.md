@@ -143,6 +143,6 @@ npm install node-boot --save
 
 
 ## Contribute 
-Do you want to contribute? Please send a pull request... let's make it great!
+Do you want to contribute? Please open an issue or send a pull request... let's make it great!
 
 
