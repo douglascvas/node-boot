@@ -136,4 +136,13 @@ Simple:
 npm install node-boot --save
 ```
 
+## Todo:
+
+* Add error handler support
+* Add authentication/authorization mechanism
+
+
+## Contribute 
+Do you want to contribute? Please send a pull request... let's make it great!
+
 

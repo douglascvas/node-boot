@@ -4,7 +4,7 @@
     "rootDir": "src",
     "outDir": "lib",
     "sourceMap": true,
-    "target": "es2015",
+    "target": "es6",
     "module": "commonjs",
     "declaration": true,
     "noImplicitAny": false,
@@ -13,9 +13,8 @@
     "experimentalDecorators": true,
     "moduleResolution": "node"
   },
-  "filesGlob": [
-    "./src/**/*.ts",
-    "./typings/index.d.ts"
+  "include": [
+    "./src/**/*.ts"
   ],
   "exclude": [
     "node_modules"
