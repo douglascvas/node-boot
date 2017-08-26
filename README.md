@@ -10,35 +10,80 @@ You can simplify [a lot] your Node.JS development with Typescript by using Depen
 
 ```typescript
 
-@AutoScan(`${__dirname}/**/*.js`)
 export class MyShop {
   
+  // defines a method that will create the database client instance
   @Factory('database')
   public databaseFactory(): Mongo {
     return new Mongo();
   }
 }
 
+// define a class to be instantiated by the framework and injected in whatever class needs it
 @Service
 export class PaymentService {
   public pay(): Promise<void> {
-     // do whatever
+     // ...
   }
 }
 
-@Service
+// Declares a filter class, that will access the request before it is handled by the controller that uses it
+@Filter
+export class BigPaymentFilter implements BasicFilter {
+  public filter(request: any, response: any, next: Function): Promise<any> {
+    if(request.body && request.body.amount > 1000){
+      console.log('That is a big amount!')
+      return next();
+    }
+  }
+}
+
+@Controller({path: '/payment'})
 export class PaymentController {
   constructor(private paymentService: PaymentService){
   }
   
+  // define a REST api - this will be automatically registered on your REST framework, i.e. expressJs
+  // the ResponseBody annotation will take care of the returned value, setting it into the response
   @ResponseBody
-  @RequestMapping('/payment', RequestType.POST)
-  public paymentApi(request, response): Payment {
-    this.paymentService.pay();
+  @RequestMapping('/pay', RequestType.POST, filters: [BigPaymentFilter])
+  public async paymentApi(request, response): Promise<Payment> {
+    // you can use promises here as well
+    let paymentData = await this.paymentService.pay();
     return "Your payment succeeded!";
   }
 }
 ```
+
+You can see some little demo application in the test/demo folder.
+
+## How do I use it?
+
+1. First of all you need a main class. Take as example the `MyShop` class. 
+2. Now you need to bootstrap your application using node-boot. It will instantiate your main class and resolve the registered dependencies.
+```typescript
+import {ApplicationManager, ClassProcessor, ExpressWebManagerClassProcessor} from "node-boot";
+import * as express from "express";
+
+// Initialize the web manager, used by node-boot to manage RESTful APIs.
+// The Express web manager is already provided by node-boot (you can use other frameworks when 
+// you want, you just need to implement the ClassProcessor interface)
+const expressWebManager: ClassProcessor = ExpressWebManagerClassProcessor.Builder(this.expressApp).build();
+
+// Initialize the node-boot class that will manage your application, doing all the 'magic'
+const applicationManager: ApplicationManager = ApplicationManager.Builder(MyApp)
+      .withClassProcessors(expressWebManager)
+      .withAutoScan(`${__dirname}/**/*.ts`, './node_modules/**')
+      .build();
+
+
+// Start wiring up things and registering your apis (if any)
+applicationManager.bootstrap();
+```
+1. Notice that in the example above we used a web manager. It is optional though, just use it if you want node-boot to handle your REST apis.
+2. Notice also that we used `withAutoScan(...)`. It is optional, and you can use that to tell node-boot to automatically scan all the files in our project that matches the first parameter, excluding from the search the files that match the second parameter. If you opt to not use the auto scanner, you will have to manually register all your dependencies using the `ApplicationManager`.
+
+To see other example how to use it, see the `TestApplication.ts` demo application at `src/test/demo` folder.
 
 ## Which annotations are available?
 
@@ -49,82 +94,156 @@ That means that all the constructor arguments will also be resolved automaticall
 
 In the example above, bookingService will be instantiated automatically and passed as parameter to the paymentController, that will also be instantiated automatically.
 
-### @AutoScan
+Syntax:
+`@Service(string | FilterOptions)`
 
-Tells the application to scan all the files that match the glob pattern passed as parameter to the annotation.
+If the parameter is a string, it will be used as the API URI.
 
-In the example node-boot will load all the javascript files, recursively, that are located in the current directory. Notice that it will scan **.js** files, and not **ts**, as our source code will be transpiled from typescript to javascript, right?
+If no parameter is given, or no name is given, the name will be extracted from the class name. So:
+```
+@Service
+class MyService {
+}
+```
+will be registered as `myService`.
+
+### @Factory
+
+Declares a function that will act as a factory for some value. In other words, the value returned by the function will be registered by node-boot so it can be injected in classes that references it.
 
 Syntax:
-`@AutoScan(includePaths, excludePaths)`
-* `includePaths: string|Array<string>` - Glob syntax used to match the files to load.
-* `excludePaths: string|Array<string>` - Glob syntax used to match the files to **not** load.
+`@Factory(string | FactoryOptions)`
+
+If the parameter is a string, it will be used as the name of the registered value.
+
+If no parameter is given, or no name is given, the name will be extracted from the function name. So:
+```
+@Factory
+public database() {
+}
+```
+will be registered as `database`.
+
+You can also use parameters in your factory function. Any parameter declared will be resolved and injected by node-boot into the function when calling it.
+```typescript
+ @Factory
+ public database(cache) {
+  // node-boot will check if you registered anything named 'cache' and will pass here as parameter 
+ }
+```
+
+### @Controller
+
+This annotation extends the `@Service` annotation, what means that the annotated class will be registered as a service.
+You **must** use this annotation in classes where you have REST endpoints to be managed by node-boot.
+
+For the available annotation parameters see the ControllerOptions interface.
+
+Syntax:
+`@Controller(ControllerOptions)`
+
+If no parameter is given, or no name is given, the name will be extracted from the class name. So:
+```
+@Controller
+class MyController {
+}
+```
+will be registered as `myController`.
+
+### @Filter
+
+This annotation extends the `@Service` annotation, what means that the annotated class will be registered as a service.
+Use this annotation for defining classes whose `filter` function will be used as a middleware to those APIs that reference this filter.
+The annotated class **must** implement the `BasicFilter` interface.
+
+For the available annotation parameters see the FilterOptions interface.
+
+```typescript
+@Filter('myTestFilter')
+class TestFilter implements BasicFilter {
+  public filter(request: any, response: any, next: Function): Promise<any> {
+    //...
+  }
+}
+
+@Controller
+class TestFilter implements BasicFilter {
+  @RequestMapping({uri: '/foo', filters: ['myTestFilter']})
+  public filter(request: any, response: any, next: Function): Promise<any> {
+    //...
+  }
+}
+```
+
+Syntax:
+`@Filter(string | FilterOptions)`
+
+If the parameter is a string, it will be used as the API URI.
+
+If no parameter is given, or no name is given, the name will be extracted from the class name. So:
+```
+@Filter
+class MyFilter {
+}
+```
+will be registered as `myFilter`.
 
 ### @ResponseBody
 
 Tells node-boot to handle the return value of the annotated function and set it in the http response. Therefore, you don't need to do `response.send(200, payment)`, but instead just return the `payment` object.
 
+Syntax:
+`@ResponseBody`
+
 ### @RequestMapping
 
 This annotations tells node-boot to register a REST api with the path passed as first parameter to the annotation, and using the request type passed as second.
+The final API URL will be the concatenation of the path declared in the `@Controller` if any and the path attribute from the `@RequestPath`
+
+For the available annotation parameters, see the RequestMappingOptions interface.
 
 Syntax:
-`@RequestMapping(path, requestType)`
-* `path: string` - Path to the REST api.
-* `requestType: RequestType` - HTTP method.
- 
-## How do I use it?
+`@RequestMapping(string | RequestMappingOptions)`
 
-1. First of all you need a main class. Take as example the `MyShop` class. You don't need to use file scan if you don't want, but if you don't you will need to register all your classes manually into node-boot.
-2. Now you need to bootstrap your application using node-boot. It will instantiate your main class and resolve the registered dependencies.
+If the parameter is a string, it will be used as the API URI.
+
+In case you want to use a filter, you can use the `RequestMappingOptions` `filters` parameter, which takes an array containing either the filter class or the filter name. Example:
+
 ```typescript
-import {ApplicationManager} from "node-boot";
-import * as express from "express";
-
-// Initialize the web manager, used by node-boot in the ApplicationManager to manage RESTful APIs.
-// The Express web manager is already provided by node-boot (you can use other frameworks when 
-// you want, you just need to implement the webManager interface)
-const webManager: WebManager = new ExpressWebManager(express());
-
-// Initialize the node-boot class that will manage your application, doing all the 'magic'
-const applicationManager: ApplicationManager = new ApplicationManager(MyApp, webManager);
-
-// Start wiring up things and registering your apis (if any)
-applicationManager.bootstrap();
+@Filter('fooFilter')
+class MyFilter { /*...*/ }
 ```
-Notice that in the example above we used a web manager. It is optional though, just use it if you want node-boot to handle your REST apis.
 
-## What about NOT using the AutoScanner?
+`@RequestMapping({..., filters: [ MyFilter ]})`
+and
+`@RequestMapping({..., filters: [ 'fooFilter' ]})`
+will do the same thing. 
+
+## Registering classes manually
 Then you have to register your classes manually. Example:
 
 ```typescript
 applicationManager.registerService(PaymentService)
 applicationManager.registerService(PaymentController)
-applicationManager.registerFactory('database', MyShop.prototype.databaseFactory, 'myShop')
+applicationManager.registerFactory({
+  name: 'database', 
+  factoryFn: MyShop.prototype.databaseFactory,
+  context: MyShop
+})
 ```
 
-It doesn't matter in which order you register them. Just make sure you register all before calling `applicatinManager.bootstrap()`.
+> It doesn't matter in which order you register. Just make sure you register all before calling `applicationManager.bootstrap()`.
 
 ## ApplicationManager 
 This is the bridge between your application and node-boot. 
  
-* `constructor(mainApplicationClass: Function, webManager?: WebManager, loggerFactory?: LoggerFactory, dependencyInjector?: DependencyInjector, moduleScannerService?: ModuleScannerService)`
-  * `mainApplicationClass: Function` - The main application class, that will be instantiated and managed by node-boot. 
-  * `webManager?: WebManager` - Class that will be used for operations related to web management, as registration of REST APIs. Only required when using web related annotations, as @RequestMapping 
-  * `loggerFactory?: LoggerFactory` - Optional factory responsible for creating the Logger, to be used for logging.
-  * `dependencyInjector?: DependencyInjector` - Optional injector, in case you want to give a personalized injector. If not given, the DefaultDependencyInjector will be used.
-  * `moduleScannerService?: ModuleScannerService`- Optional service that is responsible for scanning files (used in conjunction with @AutoScan). If not given, a DefaultModuleScanner will be used. 
- 
-* `registerService(classz: Function, name?: string)` - registers a class to be automatically instantiated
-  * `classz: any` - Class to be instantiated by node-boot.
-  * `name: string` - Optional name for the instance. If not given, it will be extracted from the class name. PaymentService class will be named *`paymentService`*, for instance.
+* `registerService(Function | ServiceOptions)` - registers a class to be automatically instantiated
+  You can pass either the class to be registered, or a ServiceOptions object containing more options.
 
-* `registerFactory(name: string|Function, factoryFn: Function, instance?: any)` - registers a function to be used a factory, so to be called to generate an instance for such name
-  * `name: string|Function` - The name of the instance that will be produced. If it is a class, the name will be extracted from the class name. Example: *`database`*
-  * `factoryFn: string` - The function that will be called to construct the instance. Example: *`MyShop.prototype.databaseFactory`*
-  * `context` - Optional parameter. This defines the instance from which the factory function will be called (consider it as the *`this`* from the function). It will be most probably a string, representing the name of the instance if you want node-boot to find/instantiate it automatically. It can also be a Class reference though, if you want that node-boot extracts the name for you. Example: *`myShop`*.
+* `registerFactory(Function | FactoryOptions)` - registers a function to be used a factory, so to be called to generate an instance for such name
+  You can pass either the function to be used as factory, or a FactoryOptions object containing more options.
 
-* `registerValue(name: string, value: any)` - registers a value so that node-boot can use it to inject in other instances.
+* `registerValue(name: string, value: any)` - registers a static value so that node-boot can use it to inject in other instances.
   * `name: string` - Name for the value. Whenever node-boot finds a parameter with this name in the constructor of a class being instantiated, it will inject the value passed as second parameter to this function. 
   * `value: any` - Value to be registered.
 
@@ -144,5 +263,23 @@ npm install node-boot --save
 
 ## Contribute 
 Do you want to contribute? Please open an issue or send a pull request... let's make it great!
+
+
+
+## Changelog
+
+**2.0**:
+- Major rewrite of code. 
+- Created support for plugins (class processors and class providers). 
+- Classes are instantiated now using builder pattern. 
+- Created support for filters. 
+- Changed signature for ApplicationManager 
+- All classes are now built with Builder pattern. 
+- WebManager became an interface, which is implemented by ExpressWebManager 
+- Changed signature of methods in DependencyManager. 
+- Changed signature of methods in ApplicationManager. 
+- Removed @AutoScan in favor of configuring directly when building ApplicationManager.
+- Some minor fixes. 
+- Adjusted documentation accordingly.
 
 
