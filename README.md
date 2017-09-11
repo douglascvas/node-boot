@@ -269,17 +269,17 @@ Do you want to contribute? Please open an issue or send a pull request... let's 
 ## Changelog
 
 **2.0**:
-- Major rewrite of code. 
-- Created support for plugins (class processors and class providers). 
-- Classes are instantiated now using builder pattern. 
-- Created support for filters. 
-- Changed signature for ApplicationManager 
-- All classes are now built with Builder pattern. 
-- WebManager became an interface, which is implemented by ExpressWebManager 
-- Changed signature of methods in DependencyManager. 
-- Changed signature of methods in ApplicationManager. 
-- Removed @AutoScan in favor of configuring directly when building ApplicationManager.
-- Some minor fixes. 
-- Adjusted documentation accordingly.
+- <sup>Major rewrite of code.</sup> 
+- <sup>Created support for plugins (class processors and class providers).</sup> 
+- <sup>Classes are instantiated now using builder pattern.</sup> 
+- <sup>Created support for filters.</sup> 
+- <sup>Changed signature for ApplicationManager</sup> 
+- <sup>All classes are now built with Builder pattern.</sup> 
+- <sup>WebManager became an interface, which is implemented by ExpressWebManager</sup> 
+- <sup>Changed signature of methods in DependencyManager.</sup> 
+- <sup>Changed signature of methods in ApplicationManager.</sup> 
+- <sup>Removed @AutoScan in favor of configuring directly when building ApplicationManager.</sup>
+- <sup>Some minor fixes.</sup> 
+- <sup>Adjusted documentation accordingly.</sup>
 
 
