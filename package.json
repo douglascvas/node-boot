@@ -6,7 +6,9 @@
   "typings": "./lib/index",
   "types": "./lib/index.d.ts",
   "files": [
-    "lib/"
+    "lib/main/",
+    "lib/index.js",
+    "lib/index.d.ts"
   ],
   "scripts": {
     "build": "node ./node_modules/.bin/del lib && node ./node_modules/.bin/tsc",
