@@ -23,6 +23,9 @@ export class ObjectUtils {
     if (asString === '[object]') {
       asString = classz.constructor.toString();
     }
+    if (classz.name) {
+      return classz.name;
+    }
     let match = asString.match(/(?:function|class)[\s]*(\w+).*(\(|\{)/);
     if (!match) {
       console.log('The class must specify a name.', classz);
@@ -44,9 +47,25 @@ export class ObjectUtils {
     if (!match) {
       return [];
     }
+
+
     return match[1]
       .split(',')
-      .map(name => name.trim()).filter((value: string, index: number, array: string[]) => !!value);
+      .map(name => name.trim())
+      .filter((value: string, index: number, array: string[]) => !!value)
+      .map(param => ObjectUtils.removeInitialUnderscores(param));
+  }
+
+  private static removeInitialUnderscores(param: string): string {
+    let correctName = param.match(/[_]*(.*)/)[1];
+    if (!correctName) {
+      return param;
+    }
+    return correctName;
+  }
+
+  public static instantiate(classz, dependencies) {
+    return new (Function.prototype.bind.apply(classz, [classz].concat(dependencies)));
   }
 
   /**

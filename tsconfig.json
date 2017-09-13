@@ -1,12 +1,13 @@
 {
-  "compileOnSave": false,
+  "compileOnSave": true,
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "lib",
     "sourceMap": true,
-    "target": "es6",
+    "target": "es2015",
     "module": "commonjs",
     "declaration": true,
+    "diagnostics": true,
     "noImplicitAny": false,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -14,7 +15,9 @@
     "moduleResolution": "node"
   },
   "include": [
-    "./src/**/*.ts"
+    "./src/**/*.ts",
+    "./src/main/**.d.ts",
+    "./node_modules/@types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules"

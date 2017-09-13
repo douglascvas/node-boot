@@ -9,8 +9,8 @@
     "lib"
   ],
   "scripts": {
-    "build": "node ./node_modules/.bin/rimraf lib && node ./node_modules/.bin/tsc",
-    "test": "node ./node_modules/.bin/_mocha --require ts-node/register --ui bdd src/test/**/*.unittest.ts src/test/*.unittest.ts"
+    "build": "node ./node_modules/.bin/del lib && node ./node_modules/.bin/tsc",
+    "test": "node ./node_modules/mocha/bin/_mocha --compilers ts:ts-node/register --recursive src/test/**/*"
   },
   "repository": {
     "type": "git",
@@ -36,18 +36,23 @@
     "source-map-support": "^0.4.10"
   },
   "devDependencies": {
-    "@types/chai": "^3.4.34",
-    "@types/glob": "^5.0.30",
+    "@types/chai": "^4.0.4",
+    "@types/express": "^4.0.37",
+    "@types/glob": "^5.0.32",
     "@types/minimatch": "^2.0.29",
-    "@types/mocha": "^2.2.39",
+    "@types/mocha": "^2.2.42",
     "@types/node": "^7.0.4",
-    "@types/sinon": "^1.16.35",
+    "@types/sinon": "^2.3.3",
     "@types/source-map-support": "^0.2.28",
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0",
-    "rimraf": "^2.5.4",
-    "sinon": "^1.17.7",
-    "ts-node": "^2.1.0",
-    "typescript": "^2.1.5"
+    "@types/supertest": "^2.0.3",
+    "chai": "^4.1.1",
+    "del-cli": "^0.2.1",
+    "express": "^4.15.4",
+    "mocha": "^3.5.0",
+    "require": "^2.4.20",
+    "sinon": "^3.2.1",
+    "supertest": "^3.0.0",
+    "ts-node": "^3.3.0",
+    "typescript": "^2.4.2"
   }
 }
