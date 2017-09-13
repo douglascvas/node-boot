@@ -11,7 +11,7 @@
     "lib/index.d.ts"
   ],
   "scripts": {
-    "build": "node ./node_modules/.bin/del lib && node ./node_modules/.bin/tsc",
+    "build": "node ./node_modules/.bin/del lib && node ./node_modules/.bin/tsc && node ./node_modules/.bin/del lib/test",
     "test": "node ./node_modules/mocha/bin/_mocha --compilers ts:ts-node/register --recursive src/test/**/*",
     "prepublishOnly": "npm run build"
   },
