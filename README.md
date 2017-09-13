@@ -100,7 +100,7 @@ Syntax:
 If the parameter is a string, it will be used as the API URI.
 
 If no parameter is given, or no name is given, the name will be extracted from the class name. So:
-```
+```typescript
 @Service
 class MyService {
 }
@@ -117,7 +117,7 @@ Syntax:
 If the parameter is a string, it will be used as the name of the registered value.
 
 If no parameter is given, or no name is given, the name will be extracted from the function name. So:
-```
+```typescript
 @Factory
 public database() {
 }
@@ -143,7 +143,7 @@ Syntax:
 `@Controller(ControllerOptions)`
 
 If no parameter is given, or no name is given, the name will be extracted from the class name. So:
-```
+```typescript
 @Controller
 class MyController {
 }
@@ -181,7 +181,7 @@ Syntax:
 If the parameter is a string, it will be used as the API URI.
 
 If no parameter is given, or no name is given, the name will be extracted from the class name. So:
-```
+```typescript
 @Filter
 class MyFilter {
 }
