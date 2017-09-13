@@ -40,7 +40,6 @@ describe('ApplicationManager', function () {
     loggerFactory = new TestLoggerFactory();
     appManager = ApplicationManager.Builder(TestClassMain)
       .withLoggerFactory(loggerFactory)
-      .withAutoScan("xxxx")
       .withDependencyManager(dependencyManager)
       .withServiceAnnotationClassProcessor(serviceAnnotationClassProcessor)
       .withFactoryAnnotationClassProcessor(factoryAnnotationClassProcessor)
@@ -74,7 +73,6 @@ describe('ApplicationManager', function () {
       Sinon.assert.calledWith(<SinonStub>serviceAnnotationClassProcessor.processClass, Class1, dependencyManager);
       Sinon.assert.calledWith(<SinonStub>serviceAnnotationClassProcessor.processClass, Class2, dependencyManager);
     });
-
 
     it('should call each class processor with all registered classes', async function () {
       // given

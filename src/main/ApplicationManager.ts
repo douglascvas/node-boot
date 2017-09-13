@@ -15,24 +15,27 @@ import {AutoScannerClassProvider} from "./core/autoScanner/AutoScannerClassProvi
 import {ServiceInfo} from "./dependencyManager/service/ServiceInfo";
 import {FactoryInfo} from "./dependencyManager/factory/FactoryInfo";
 import {ServiceHelper} from "./dependencyManager/service/Service";
+import {ApplicationConfig} from "./ApplicationConfig";
 
 sourceMapSupport.install();
 
 export class ApplicationManager {
 
   private _logger: Logger;
+  private _loggerFactory: LoggerFactory;
   private _classProcessors: Set<ClassProcessor>;
   private _mainApplicationClass: any;
   private _mainApplicationInstance: any;
   private _dependencyManager: DependencyManager;
   private _classProviders: Set<ClassProvider>;
-  private _autoScanEnabled: boolean;
   private _registeredClasses: Set<Function>;
   private _autoScannerClassProvider: AutoScannerClassProvider;
+  private _applicationConfig: ApplicationConfig;
 
   constructor(builder: ApplicationManagerBuilder) {
     assert(builder.mainApplicationClass, "mainApplicationClass is required");
 
+    this._applicationConfig = new ApplicationConfig();
     let loggerFactory: LoggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
     let serviceAnnotationClassProcessor = builder.serviceAnnotationClassProcessor ||
       ServiceAnnotationClassProcessor.Builder().withLoggerFactory(builder.loggerFactory)
@@ -42,11 +45,9 @@ export class ApplicationManager {
         .build();
 
     this._logger = loggerFactory.getLogger(ApplicationManager);
-    this._autoScanEnabled = !!builder.autoScanOptions;
+    this._loggerFactory = loggerFactory;
     this._mainApplicationClass = builder.mainApplicationClass;
-    this._autoScannerClassProvider = builder.autoScannerClassProvider || AutoScannerClassProvider.Builder(builder.autoScanOptions)
-      .withLoggerFactory(loggerFactory)
-      .build();
+    this._autoScannerClassProvider = builder.autoScannerClassProvider;
 
     this._dependencyManager = builder.dependencyManager || DefaultDependencyManager.Builder()
       .withLoggerFactory(loggerFactory)
@@ -60,7 +61,10 @@ export class ApplicationManager {
     this._classProcessors.add(factoryAnnotationClassProcessor);
 
     this._classProviders = new Set(builder.classProviders || []);
-    this.useAutoScanIfEnabled(loggerFactory);
+  }
+
+  public configuration(): ApplicationConfig {
+    return this._applicationConfig;
   }
 
   public async registerService(serviceInfo: ServiceInfo | Function): Promise<void> {
@@ -107,6 +111,7 @@ export class ApplicationManager {
       return this._mainApplicationInstance;
     }
 
+    this.useAutoScanIfEnabled();
     await this.registerService({classz: this._mainApplicationClass, name: 'main'});
     await this.findClassesToBeRegistered();
 
@@ -136,8 +141,11 @@ export class ApplicationManager {
     return classInfoBlocks.reduce((previous, current) => [...previous, ...current], []);
   }
 
-  private useAutoScanIfEnabled(loggerFactory: LoggerFactory) {
-    if (this._autoScanEnabled) {
+  private useAutoScanIfEnabled() {
+    if (this._applicationConfig.autoScanEnabled) {
+      this._autoScannerClassProvider = this._autoScannerClassProvider || AutoScannerClassProvider.Builder(this._applicationConfig.autoScanOptions)
+        .withLoggerFactory(this._loggerFactory)
+        .build();
       this._classProviders.add(this._autoScannerClassProvider)
     }
   }
@@ -201,20 +209,6 @@ export class ApplicationManagerBuilder {
     return this;
   }
 
-  public withAutoScan(include: string | string[], exclude?: string | string[]): ApplicationManagerBuilder {
-    if (typeof include === 'string') {
-      include = [include];
-    }
-    if (typeof exclude === 'string') {
-      exclude = [exclude];
-    }
-    this._autoScanOptions = {
-      include: include,
-      exclude: exclude
-    };
-    return this;
-  }
-
   public withAutoScannerClassProvider(provider: AutoScannerClassProvider): ApplicationManagerBuilder {
     this._autoScannerClassProvider = provider;
     return this;
@@ -234,10 +228,6 @@ export class ApplicationManagerBuilder {
 
   get classProviders(): ClassProvider[] {
     return this._classProviders;
-  }
-
-  get autoScanOptions(): AutoScanOptions {
-    return this._autoScanOptions;
   }
 
   get factoryAnnotationClassProcessor(): FactoryAnnotationClassProcessor {

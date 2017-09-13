@@ -22,8 +22,9 @@ export class TestApplication {
     let applicationManager: ApplicationManager = ApplicationManager.Builder(TestServer)
       .withLoggerFactory(loggerFactory)
       .withClassProcessors(expressWebManagerPlugin)
-      .withAutoScan(`${__dirname}/**/*.ts`, './node_modules/**')
       .build();
+
+    applicationManager.configuration().enableAutoScan(`${__dirname}/**/*.ts`, './node_modules/**');
 
     await applicationManager.registerValue("app", this.expressApp);
     let server: TestServer = await applicationManager.bootstrap();

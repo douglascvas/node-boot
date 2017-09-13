@@ -10,6 +10,7 @@ You can simplify [a lot] your Node.JS development with Typescript by using Depen
 
 ```typescript
 
+import {Factory} from "node-boot";
 export class MyShop {
   
   // defines a method that will create the database client instance
@@ -19,6 +20,7 @@ export class MyShop {
   }
 }
 
+import {Service} from "node-boot";
 // define a class to be instantiated by the framework and injected in whatever class needs it
 @Service
 export class PaymentService {
@@ -27,6 +29,7 @@ export class PaymentService {
   }
 }
 
+import {Filter, BasicFilter} from "node-boot";
 // Declares a filter class, that will access the request before it is handled by the controller that uses it
 @Filter
 export class BigPaymentFilter implements BasicFilter {
@@ -37,6 +40,8 @@ export class BigPaymentFilter implements BasicFilter {
     }
   }
 }
+
+import {Controller, ResponseBody, RequestMapping, RequestType} from "node-boot";
 
 @Controller({path: '/payment'})
 export class PaymentController {
@@ -73,15 +78,16 @@ const expressWebManager: ClassProcessor = ExpressWebManagerClassProcessor.Builde
 // Initialize the node-boot class that will manage your application, doing all the 'magic'
 const applicationManager: ApplicationManager = ApplicationManager.Builder(MyApp)
       .withClassProcessors(expressWebManager)
-      .withAutoScan(`${__dirname}/**/*.ts`, './node_modules/**')
       .build();
+
+applicationManager.configuration().enableAutoScan(`${__dirname}/**/*.ts`, './node_modules/**');
 
 
 // Start wiring up things and registering your apis (if any)
 applicationManager.bootstrap();
 ```
 1. Notice that in the example above we used a web manager. It is optional though, just use it if you want node-boot to handle your REST apis.
-2. Notice also that we used `withAutoScan(...)`. It is optional, and you can use that to tell node-boot to automatically scan all the files in our project that matches the first parameter, excluding from the search the files that match the second parameter. If you opt to not use the auto scanner, you will have to manually register all your dependencies using the `ApplicationManager`.
+2. Notice also that we used `enableAutoScan(...)`. It is optional, and you can use that to tell node-boot to automatically scan all the files in our project that matches the first parameter, excluding from the search the files that match the second parameter. If you opt to not use the auto scanner, you will have to manually register all your dependencies using the `ApplicationManager`.
 
 To see other example how to use it, see the `TestApplication.ts` demo application at `src/test/demo` folder.
 
