@@ -47,5 +47,3 @@ export class ServiceHelper {
     return ServiceHelper.getMetadata(servicesMetadataKey, target, null);
   }
 }
-
-export default Service;

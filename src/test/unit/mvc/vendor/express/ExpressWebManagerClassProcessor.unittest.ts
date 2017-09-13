@@ -8,7 +8,7 @@ import {ControllerLoader} from "../../../../../main/mvc/controller/ControllerLoa
 import {ExpressApiLoader} from "../../../../../main/mvc/vendor/express/ExpressApiLoader";
 import {DefaultDependencyManager} from "../../../../../main/dependencyManager/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../../TestLoggerFactory";
-import ExpressWebManagerClassProcessor from "../../../../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
+import {ExpressWebManagerClassProcessor} from "../../../../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
 import SinonStub = Sinon.SinonStub;
 
 const assert = chai.assert;

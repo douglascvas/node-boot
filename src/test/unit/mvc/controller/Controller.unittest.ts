@@ -1,7 +1,7 @@
 'use strict';
 
 import * as chai from "chai";
-import {ControllerHelper, default as Controller} from "../../../../main/mvc/controller/Controller";
+import {ControllerHelper, Controller} from "../../../../main/mvc/controller/Controller";
 import {ControllerInfo} from "../../../../main/mvc/controller/ControllerInfo";
 import {ServiceHelper} from "../../../../main/dependencyManager/service/Service";
 import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";

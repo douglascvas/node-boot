@@ -3,5 +3,3 @@ export interface UnitInfo {
   value: any;
   classz: Function;
 }
-
-export default UnitInfo;

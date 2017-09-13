@@ -3,7 +3,7 @@ import {CalculationService} from "./CalculationService";
 import {RequestMapping} from "../../main/mvc/api/RequestMapping";
 import {ResponseBody} from "../../main/mvc/api/ResponseBody";
 import {TestFilter} from "./PositiveValueFilter";
-import RequestType from "../../main/mvc/api/RequestType";
+import {RequestType} from "../../main/mvc/api/RequestType";
 
 @Controller({uri: "/calculation"})
 export class CalculationController {

@@ -14,5 +14,3 @@ export class RequestType {
     return this._value;
   }
 }
-
-export default RequestType;

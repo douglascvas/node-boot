@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {FilterInfo} from "./FilterInfo";
 import {FilterOptions} from "./FilterOptions";
-import Service from "../../dependencyManager/service/Service";
+import {Service} from "../../dependencyManager/service/Service";
 
 const filtersMetadataKey = Symbol("filtersMD");
 
@@ -70,5 +70,3 @@ export class FilterHelper {
     return FilterHelper.getMetadata(filtersMetadataKey, target, null);
   }
 }
-
-export default Filter;

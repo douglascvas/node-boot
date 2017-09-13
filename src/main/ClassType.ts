@@ -14,5 +14,3 @@ export class ClassType {
     return type.value === this.value;
   }
 }
-
-export default ClassType;

@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {ControllerInfo} from "./ControllerInfo";
 import {ControllerOptions} from "./ControllerOptions";
-import Service from "../../dependencyManager/service/Service";
+import {Service} from "../../dependencyManager/service/Service";
 
 const controllersMetadataKey = Symbol("controllersMD");
 
@@ -62,5 +62,3 @@ export class ControllerHelper {
     return ControllerHelper.getMetadata(controllersMetadataKey, target, null);
   }
 }
-
-export default Controller;

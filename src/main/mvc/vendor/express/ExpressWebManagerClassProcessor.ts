@@ -6,7 +6,7 @@ import {ConsoleLoggerFactory} from "../../../logging/ConsoleLoggerFactory";
 import {ExpressApiLoader} from "./ExpressApiLoader";
 import {ApiLoader} from "../../api/ApiLoader";
 
-export default class ExpressWebManagerClassProcessor implements ClassProcessor {
+export class ExpressWebManagerClassProcessor implements ClassProcessor {
   private _logger: Logger;
   private _expressApp: any;
   private _apiLoader: ApiLoader;

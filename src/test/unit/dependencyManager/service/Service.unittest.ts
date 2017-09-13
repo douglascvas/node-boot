@@ -2,7 +2,7 @@
 
 import * as chai from "chai";
 import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";
-import {default as Service, ServiceHelper} from "../../../../main/dependencyManager/service/Service";
+import {Service, ServiceHelper} from "../../../../main/dependencyManager/service/Service";
 
 const assert = chai.assert;
 

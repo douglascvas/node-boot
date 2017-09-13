@@ -2,7 +2,7 @@
   "compileOnSave": true,
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib",
+    "outDir": "lib/",
     "sourceMap": true,
     "target": "es2015",
     "module": "commonjs",

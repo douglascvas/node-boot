@@ -4,7 +4,7 @@ import {TestServer} from "./TestServer";
 import {ApplicationManager} from "../../main/ApplicationManager";
 import * as express from "express";
 import {ClassProcessor} from "../../main/core/ClassProcessor";
-import ExpressWebManagerClassProcessor from "../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
+import {ExpressWebManagerClassProcessor} from "../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
 
 export class TestApplication {
   public expressApp: any;

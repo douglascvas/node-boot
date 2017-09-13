@@ -54,5 +54,3 @@ export class FactoryHelper {
     return FactoryHelper.getMetadata(factoryMetadataKey, target, []);
   }
 }
-
-export default Factory;

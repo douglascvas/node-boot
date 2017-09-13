@@ -6,7 +6,7 @@ import {LoggerFactory} from "../../main/logging/LoggerFactory";
 import {DependencyManager} from "../../main/dependencyManager/DependencyManager";
 import {TestLoggerFactory} from "./TestLoggerFactory";
 import {DefaultDependencyManager} from "../../main/dependencyManager/DefaultDependencyManager";
-import Service from "../../main/dependencyManager/service/Service";
+import {Service} from "../../main/dependencyManager/service/Service";
 import {ClassInfo} from "../../main/ClassInfo";
 import {ServiceAnnotationClassProcessor} from "../../main/dependencyManager/service/ServiceAnnotationClassProcessor";
 import {FactoryAnnotationClassProcessor} from "../../main/dependencyManager/factory/FactoryAnnotationClassProcessor";

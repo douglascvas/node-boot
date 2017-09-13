@@ -2,7 +2,7 @@
 
 import * as chai from "chai";
 import {FactoryInfo} from "../../../../main/dependencyManager/factory/FactoryInfo";
-import {default as Factory, FactoryHelper} from "../../../../main/dependencyManager/factory/Factory";
+import {Factory, FactoryHelper} from "../../../../main/dependencyManager/factory/Factory";
 
 const assert = chai.assert;
 

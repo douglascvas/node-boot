@@ -1,7 +1,7 @@
 'use strict';
 
 import * as chai from "chai";
-import {default as Filter, FilterHelper} from "../../../../main/mvc/filter/Filter";
+import {Filter, FilterHelper} from "../../../../main/mvc/filter/Filter";
 import {FilterInfo} from "../../../../main/mvc/filter/FilterInfo";
 import {ServiceHelper} from "../../../../main/dependencyManager/service/Service";
 import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";

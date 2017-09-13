@@ -1,4 +1,4 @@
-import RequestType from "./RequestType";
+import {RequestType} from "./RequestType";
 import {ApiInfo} from "./ApiInfo";
 import {RequestMappingOptions} from "./RequestMappingOptions";
 
@@ -42,5 +42,3 @@ export class MvcHelper {
       [];
   }
 }
-
-export default RequestMapping;

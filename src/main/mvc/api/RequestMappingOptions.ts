@@ -1,4 +1,4 @@
-import RequestType from "./RequestType";
+import {RequestType} from "./RequestType";
 import {BasicFilter} from "../filter/BasicFilter";
 
 export interface RequestMappingOptions {
