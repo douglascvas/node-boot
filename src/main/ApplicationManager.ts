@@ -36,6 +36,11 @@ export class ApplicationManager {
     assert(builder.mainApplicationClass, "mainApplicationClass is required");
 
     this._applicationConfig = new ApplicationConfig();
+    // Kept for compatibility with latest versions.
+    if (builder.autoScanOptions) {
+      this._applicationConfig.enableAutoScan(builder.autoScanOptions.include, builder.autoScanOptions.exclude);
+    }
+
     let loggerFactory: LoggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
     let serviceAnnotationClassProcessor = builder.serviceAnnotationClassProcessor ||
       ServiceAnnotationClassProcessor.Builder().withLoggerFactory(builder.loggerFactory)
@@ -209,6 +214,21 @@ export class ApplicationManagerBuilder {
     return this;
   }
 
+  // Kept for compatibility with latest versions.
+  public withAutoScan(include: string | string[], exclude?: string | string[]): ApplicationManagerBuilder {
+    if (typeof include === 'string') {
+      include = [include];
+    }
+    if (typeof exclude === 'string') {
+      exclude = [exclude];
+    }
+    this._autoScanOptions = {
+      include: include,
+      exclude: exclude
+    };
+    return this;
+  }
+
   public withAutoScannerClassProvider(provider: AutoScannerClassProvider): ApplicationManagerBuilder {
     this._autoScannerClassProvider = provider;
     return this;
@@ -228,6 +248,10 @@ export class ApplicationManagerBuilder {
 
   get classProviders(): ClassProvider[] {
     return this._classProviders;
+  }
+
+  get autoScanOptions(): AutoScanOptions {
+    return this._autoScanOptions;
   }
 
   get factoryAnnotationClassProcessor(): FactoryAnnotationClassProcessor {
