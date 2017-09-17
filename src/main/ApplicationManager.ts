@@ -16,6 +16,8 @@ import {ServiceInfo} from "./dependencyManager/service/ServiceInfo";
 import {FactoryInfo} from "./dependencyManager/factory/FactoryInfo";
 import {ServiceHelper} from "./dependencyManager/service/Service";
 import {ApplicationConfig} from "./ApplicationConfig";
+import {Deprecated} from "./deprecation/Deprecated";
+import {DeprecatedAnnotationClassProcessor} from "./deprecation/DeprecatedAnnotationClassProcessor";
 
 sourceMapSupport.install();
 
@@ -36,12 +38,20 @@ export class ApplicationManager {
     assert(builder.mainApplicationClass, "mainApplicationClass is required");
 
     this._applicationConfig = new ApplicationConfig();
+    // Kept for compatibility with latest versions.
+    if (builder.autoScanOptions) {
+      this._applicationConfig.enableAutoScan(builder.autoScanOptions.include, builder.autoScanOptions.exclude);
+    }
+
     let loggerFactory: LoggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
     let serviceAnnotationClassProcessor = builder.serviceAnnotationClassProcessor ||
       ServiceAnnotationClassProcessor.Builder().withLoggerFactory(builder.loggerFactory)
         .build();
     let factoryAnnotationClassProcessor = builder.factoryAnnotationClassProcessor ||
       FactoryAnnotationClassProcessor.Builder().withLoggerFactory(builder.loggerFactory)
+        .build();
+    let deprecatedAnnotationClassProcessor = builder.deprecatedAnnotationClassProcessor ||
+      DeprecatedAnnotationClassProcessor.Builder().withLoggerFactory(builder.loggerFactory)
         .build();
 
     this._logger = loggerFactory.getLogger(ApplicationManager);
@@ -59,6 +69,7 @@ export class ApplicationManager {
     this._classProcessors = new Set(builder.classProcessors || []);
     this._classProcessors.add(serviceAnnotationClassProcessor);
     this._classProcessors.add(factoryAnnotationClassProcessor);
+    this._classProcessors.add(deprecatedAnnotationClassProcessor);
 
     this._classProviders = new Set(builder.classProviders || []);
   }
@@ -161,6 +172,7 @@ export class ApplicationManagerBuilder {
   private _autoScannerClassProvider: AutoScannerClassProvider;
   private _factoryAnnotationClassProcessor: FactoryAnnotationClassProcessor;
   private _serviceAnnotationClassProcessor: ServiceAnnotationClassProcessor;
+  private _deprecatedAnnotationClassProcessor: DeprecatedAnnotationClassProcessor;
   private _dependencyManager: DependencyManager;
   private _loggerFactory: LoggerFactory;
   private _classProviders: ClassProvider[];
@@ -199,6 +211,11 @@ export class ApplicationManagerBuilder {
     return this;
   }
 
+  public withDeprecatedAnnotationClassProcessor(deprecatedAnnotationClassProcessor: DeprecatedAnnotationClassProcessor): ApplicationManagerBuilder {
+    this._deprecatedAnnotationClassProcessor = deprecatedAnnotationClassProcessor;
+    return this;
+  }
+
   public withLoggerFactory(value: LoggerFactory): ApplicationManagerBuilder {
     this._loggerFactory = value;
     return this;
@@ -206,6 +223,22 @@ export class ApplicationManagerBuilder {
 
   public withDependencyManager(value: DependencyManager): ApplicationManagerBuilder {
     this._dependencyManager = value;
+    return this;
+  }
+
+  // Kept for compatibility with latest versions.
+  @Deprecated("Use 'applicationManager.configuration().enableAutoScan' instead.")
+  public withAutoScan(include: string | string[], exclude?: string | string[]): ApplicationManagerBuilder {
+    if (typeof include === 'string') {
+      include = [include];
+    }
+    if (typeof exclude === 'string') {
+      exclude = [exclude];
+    }
+    this._autoScanOptions = {
+      include: include,
+      exclude: exclude
+    };
     return this;
   }
 
@@ -230,12 +263,20 @@ export class ApplicationManagerBuilder {
     return this._classProviders;
   }
 
+  get autoScanOptions(): AutoScanOptions {
+    return this._autoScanOptions;
+  }
+
   get factoryAnnotationClassProcessor(): FactoryAnnotationClassProcessor {
     return this._factoryAnnotationClassProcessor;
   }
 
   get serviceAnnotationClassProcessor(): ServiceAnnotationClassProcessor {
     return this._serviceAnnotationClassProcessor;
+  }
+
+  get deprecatedAnnotationClassProcessor(): DeprecatedAnnotationClassProcessor {
+    return this._deprecatedAnnotationClassProcessor;
   }
 
   get autoScannerClassProvider(): AutoScannerClassProvider {

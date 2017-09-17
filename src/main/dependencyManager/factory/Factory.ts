@@ -24,7 +24,7 @@ export function Factory(options: FactoryOptions | Object | string,
     Reflect.defineMetadata(factoryMetadataKey, factories, target);
   }
 
-  // If not parameters where given we assume typescript passes the normal decorator parameters
+  // If no parameters where given we assume typescript passes the normal decorator parameters
   if (propertyKey && descriptor) {
     let target = <Object>options;
     factoryOptions = {
