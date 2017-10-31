@@ -3,7 +3,7 @@ import {BasicFilter} from "../../main/mvc/filter/BasicFilter";
 import * as express from 'express';
 
 @Filter
-export class TestFilter implements BasicFilter {
+export class TestFilter extends BasicFilter {
   filter(request: express.Request, response: Response, next: Function): Promise<any> {
     if (request.params.value1 < 0) {
       request.params.value1 = 0;

@@ -1,5 +1,5 @@
 import {CalculationService} from "./CalculationService";
-import {Service} from "../../main/dependencyManager/service/Service";
+import {Service} from "../../main/dependencyManager/service/ServiceAnnotation";
 
 @Service
 export class TestCalculationService extends CalculationService {

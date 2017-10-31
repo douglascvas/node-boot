@@ -7,7 +7,7 @@ import {LoggerFactory} from "../../../../main/logging/LoggerFactory";
 import {DefaultDependencyManager} from "../../../../main/dependencyManager/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../TestLoggerFactory";
 import {FactoryAnnotationClassProcessor} from "../../../../main/dependencyManager/factory/FactoryAnnotationClassProcessor";
-import {Factory} from "../../../../main/dependencyManager/factory/Factory";
+import {Factory} from "../../../../main/dependencyManager/factory/FactoryAnnotation";
 import SinonStub = Sinon.SinonStub;
 
 const assert = chai.assert;

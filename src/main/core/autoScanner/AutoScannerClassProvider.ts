@@ -7,6 +7,7 @@ import {Logger} from "../../logging/Logger";
 import {ConsoleLoggerFactory} from "../../logging/ConsoleLoggerFactory";
 import {FileScanner} from "./FileScanner";
 import {ClassProvider} from "../ClassProvider";
+import {ClassType} from "../../ClassType";
 
 export class AutoScannerClassProvider implements ClassProvider {
   private _logger: Logger;
@@ -24,7 +25,7 @@ export class AutoScannerClassProvider implements ClassProvider {
 
   public async provideClasses(): Promise<ClassInfo[]> {
     let result: ClassInfo[] = [];
-    let classMap: Map<string, Function> = await this.findClasses(this._autoScanInfo);
+    let classMap: Map<string, ClassType> = await this.findClasses(this._autoScanInfo);
 
 
     for (let entry of classMap.entries()) {

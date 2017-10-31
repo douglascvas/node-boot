@@ -7,8 +7,8 @@ import {DependencyManager} from "../../../../../main/dependencyManager/Dependenc
 import {LoggerFactory} from "../../../../../main/logging/LoggerFactory";
 import {DefaultDependencyManager} from "../../../../../main/dependencyManager/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../../TestLoggerFactory";
-import {Controller} from "../../../../../main/mvc/controller/Controller";
-import {RequestMapping} from "../../../../../main/mvc/api/RequestMapping";
+import {Controller} from "../../../../../main/mvc/controller/ControllerAnnotation";
+import {RequestMapping} from "../../../../../main/mvc/api/RequestMappingAnnotation";
 import {RequestType} from "../../../../../main/mvc/api/RequestType";
 import {BasicFilter} from "../../../../../main/mvc/filter/BasicFilter";
 import SinonStub = Sinon.SinonStub;
@@ -29,7 +29,7 @@ describe('ExpressApiLoader', function () {
       'put': Sinon.stub()
     };
     loggerFactory = new TestLoggerFactory();
-    expressApiLoader = new ExpressApiLoader(expressApp, loggerFactory);
+    expressApiLoader = ExpressApiLoader.Builder(expressApp).withLoggerFactory(loggerFactory).build();
   });
 
   describe('#loadApis()', function () {

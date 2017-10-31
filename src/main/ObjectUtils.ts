@@ -2,8 +2,12 @@
 
 import "reflect-metadata";
 
+const CONFIGURATION_KEY_PREFIX = ':node-boot-config:';
+const METADATA_KEY_PREFIX = '::node-boot:';
+const METHOD_METADATA_KEY = `${METADATA_KEY_PREFIX}:method`;
+
 export class ObjectUtils {
-  public static *toIterable(value) {
+  public static * toIterable(value) {
     if (value instanceof Array) {
       for (let i = 0; i < value.length; i++) {
         yield value[i];
@@ -64,14 +68,28 @@ export class ObjectUtils {
     return correctName;
   }
 
-  public static instantiate(classz, dependencies) {
-    return new (Function.prototype.bind.apply(classz, [classz].concat(dependencies)));
-  }
-
   /**
    * Make sure the first char is lower case.
    */
   public static toInstanceName(name) {
     return name.replace(/^./, name[0].toLowerCase());
+  }
+
+  public static getClassMethods(classz: Function): Function[] {
+    let result: Function[] = [];
+    for (let name of Object.getOwnPropertyNames(Object.getPrototypeOf(classz))) {
+      let method = classz[name];
+      if (!(method instanceof Function) || method === classz) continue;
+      result.push(method);
+    }
+    return result;
+  }
+
+  public static getConfigurationName(resourceName: string): string {
+    return CONFIGURATION_KEY_PREFIX + resourceName;
+  }
+
+  public static flattenMapValues(map: Map<any, any[]>) {
+    return Array.from(map.values()).reduce((a, b) => a.concat(b), [])
   }
 }

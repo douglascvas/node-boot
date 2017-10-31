@@ -5,7 +5,9 @@ import {ObjectUtils} from "../../ObjectUtils";
 import {ClassProcessor} from "../../core/ClassProcessor";
 import {ConsoleLoggerFactory} from "../../logging/ConsoleLoggerFactory";
 import {DependencyManager} from "../DependencyManager";
-import {FactoryHelper} from "./Factory";
+import {ClassMetadata} from "../../core/ClassMetadata";
+import {ClassType} from "../../ClassType";
+import {FactoryAnnotation} from "./FactoryAnnotation";
 
 export class FactoryAnnotationClassProcessor implements ClassProcessor {
   private _logger: Logger;
@@ -15,8 +17,10 @@ export class FactoryAnnotationClassProcessor implements ClassProcessor {
     this._logger = loggerFactory.getLogger(FactoryAnnotationClassProcessor);
   }
 
-  public async processClass(classz: Function, dependencyManager: DependencyManager): Promise<void> {
-    let factoriesInfo: FactoryInfo[] = FactoryHelper.getDeclaredFactories(classz);
+  public async processClass(classz: ClassType, dependencyManager: DependencyManager): Promise<void> {
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(classz);
+    let factoriesInfo: FactoryInfo[] = classMetadata.getMethodAnnotations(FactoryAnnotation.className)
+      .map((annotation: FactoryAnnotation) => annotation.factoryInfo);
     for (let factoryInfo of factoriesInfo) {
       this._logger.debug(`Registering @Factory ${ObjectUtils.extractClassName(classz)}: ${factoryInfo.name}`);
       await dependencyManager.factory(factoryInfo);

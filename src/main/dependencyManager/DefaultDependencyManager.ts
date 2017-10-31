@@ -6,17 +6,21 @@ import {ObjectUtils} from "../ObjectUtils";
 import {Unit} from "./Unit";
 import {ServiceInfo} from "./service/ServiceInfo";
 import {FactoryInfo} from "./factory/FactoryInfo";
+import {ObjectFactory} from "../core/ObjectFactory";
+import {ClassType} from "../ClassType";
 
 export class DefaultDependencyManager implements DependencyManager {
-  private translationMap: Map<string, string>;
-  private logger;
-  private units: Map<string, Unit>;
+  private _translationMap: Map<string, string>;
+  private _logger;
+  private _units: Map<string, Unit>;
+  private _objectFactory: ObjectFactory;
 
   constructor(private builder: DefaultDependencyManagerBuilder) {
     let loggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
-    this.logger = loggerFactory.getLogger(DefaultDependencyManager);
-    this.translationMap = new Map();
-    this.units = new Map();
+    this._logger = loggerFactory.getLogger(DefaultDependencyManager);
+    this._translationMap = new Map();
+    this._units = new Map();
+    this._objectFactory = builder.objectFactory || new ObjectFactory();
     this.value('dependencyManager', this);
   }
 
@@ -28,7 +32,7 @@ export class DefaultDependencyManager implements DependencyManager {
    * @param value {string} Value of the dependency.
    */
   public async value(name: string, value: any): Promise<void> {
-    this.logger.debug(`Registering value ${name}.`);
+    this._logger.debug(`Registering value ${name}.`);
     this.registerStaticUnit(name, value);
   }
 
@@ -36,17 +40,7 @@ export class DefaultDependencyManager implements DependencyManager {
     let name = this.extractInstanceName(serviceInfo.name || serviceInfo.classz);
     let dependencies = serviceInfo.dependencies || ObjectUtils.extractArgs(serviceInfo.classz);
 
-    let unit: Unit = this.registerServiceUnit(name, serviceInfo.classz, dependencies);
-
-    if (serviceInfo.name || serviceInfo.skipParentRegistration) {
-      return;
-    }
-
-    let parentClass = Object.getPrototypeOf(serviceInfo.classz);
-    while (parentClass && parentClass.name) {
-      this.registerServiceUnit(parentClass.name, serviceInfo.classz, dependencies, unit.name);
-      parentClass = Object.getPrototypeOf(parentClass);
-    }
+    this.registerServiceUnit(name, serviceInfo.classz, dependencies);
   }
 
   public async factory(factoryInfo: FactoryInfo): Promise<void> {
@@ -62,11 +56,11 @@ export class DefaultDependencyManager implements DependencyManager {
     let instanceName = ObjectUtils.toInstanceName(name);
 
     let notRegistered: Set<Unit> = new Set();
-    if (!this.units.has(instanceName)) {
+    if (!this._units.has(instanceName)) {
       return null;
     }
 
-    let unit: Unit = this.units.get(instanceName);
+    let unit: Unit = this._units.get(instanceName);
     if (unit.instanceReference) {
       unit = unit.instanceReference;
     }
@@ -75,7 +69,7 @@ export class DefaultDependencyManager implements DependencyManager {
 
     if (!resolved) {
       for (let missingUnit of notRegistered) {
-        this.logger.error(`The depencency ${missingUnit.name} declared in ${Array.from(missingUnit.referencedBy).join(', ')} 
+        this._logger.error(`The depencency ${missingUnit.name} declared in ${Array.from(missingUnit.referencedBy).join(', ')} 
         could not be found. Make sure you've registered it.`);
       }
       throw new Error(`The dependency could not be resolved: ${unit.name}.`)
@@ -92,7 +86,7 @@ export class DefaultDependencyManager implements DependencyManager {
   }
 
   private registerServiceUnit(name: string,
-                              classz: Function,
+                              classz: ClassType,
                               dependencies: (string | Function)[],
                               instanceFrom?: string): Unit {
 
@@ -131,10 +125,10 @@ export class DefaultDependencyManager implements DependencyManager {
 
   private getOrCreateUnit(name: string): Unit {
     let instanceName: string = ObjectUtils.toInstanceName(name);
-    let unit: Unit = this.units.get(instanceName);
+    let unit: Unit = this._units.get(instanceName);
     if (!unit) {
       unit = new Unit(instanceName);
-      this.units.set(instanceName, unit);
+      this._units.set(instanceName, unit);
     }
     return unit;
   }
@@ -209,13 +203,13 @@ export class DefaultDependencyManager implements DependencyManager {
     if (unit.factory) {
       let context: any = unit.factoryContext ? unit.factoryContext.instanceValue : null;
       if (!context) {
-        this.logger.warn(`No context defined for factory ${unit.name}. 
+        this._logger.warn(`No context defined for factory ${unit.name}. 
         You will not be able to reference "this" object in the factory function. Be sure you annotate the class containing the 
         factory method with @Service.`);
       }
       unit.instanceValue = await unit.factory.apply(context, dependencyValues);
     } else {
-      unit.instanceValue = ObjectUtils.instantiate(unit.classz, dependencyValues);
+      unit.instanceValue = await this._objectFactory.createInstance(unit.classz, dependencyValues);
     }
     unit.resolved = true;
   }
@@ -264,13 +258,23 @@ export class DefaultDependencyManager implements DependencyManager {
 
 export class DefaultDependencyManagerBuilder {
   private _loggerFactory: LoggerFactory;
+  private _objectFactory: ObjectFactory;
 
   get loggerFactory(): LoggerFactory {
     return this._loggerFactory;
   }
 
+  get objectFactory(): ObjectFactory {
+    return this._objectFactory;
+  }
+
   public withLoggerFactory(value: LoggerFactory): DefaultDependencyManagerBuilder {
     this._loggerFactory = value;
+    return this;
+  }
+
+  public withObjectFactory(value: ObjectFactory): DefaultDependencyManagerBuilder {
+    this._objectFactory = value;
     return this;
   }
 

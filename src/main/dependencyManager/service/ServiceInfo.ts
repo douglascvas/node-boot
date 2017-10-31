@@ -1,5 +1,7 @@
+import {ClassType} from "../../ClassType";
+
 export interface ServiceInfo {
-  classz: Function;
+  classz: ClassType;
   name?: string;
   skipParentRegistration?: boolean;
   dependencies?: (string | Function)[];

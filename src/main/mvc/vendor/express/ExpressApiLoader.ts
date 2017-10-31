@@ -4,13 +4,13 @@ import {Logger} from "../../../logging/Logger";
 import {ObjectUtils} from "../../../ObjectUtils";
 import {ConsoleLoggerFactory} from "../../../logging/ConsoleLoggerFactory";
 import {ApiInfo} from "../../api/ApiInfo";
-import {MvcHelper} from "../../api/RequestMapping";
 import {ApiLoader} from "../../api/ApiLoader";
 import {ControllerInfo} from "../../controller/ControllerInfo";
-import {ControllerHelper} from "../../controller/Controller";
-import {BasicFilter} from "../../filter/BasicFilter";
-import {FilterHelper} from "../../filter/Filter";
-import {FilterInfo} from "../../filter/FilterInfo";
+import {BasicFilter, BasicFilterType} from "../../filter/BasicFilter";
+import {ClassMetadata} from "../../../core/ClassMetadata";
+import {ClassType} from "../../../ClassType";
+import {ControllerAnnotation} from "../../controller/ControllerAnnotation";
+import {RequestMappingAnnotation} from "../../api/RequestMappingAnnotation";
 
 interface EndpointInfo {
   apiInfo: ApiInfo,
@@ -26,26 +26,28 @@ export class ExpressApiLoader implements ApiLoader {
   private _endpoints: EndpointInfo[];
   private _expressApp: any;
 
-  constructor(expressApp: any, loggerFactory?: LoggerFactory) {
-    loggerFactory = loggerFactory || new ConsoleLoggerFactory();
+  constructor(builder: ExpressApiLoaderBuilder) {
+    let loggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
     this._logger = loggerFactory.getLogger(ExpressApiLoader);
     this._endpoints = [];
-    this._expressApp = expressApp;
+    this._expressApp = builder.expressApp;
   }
 
-  public loadApiInfo(classz: Function) {
-    let controllerInfo: ControllerInfo = ControllerHelper.getDeclaredController(classz);
-    let apisInClass: EndpointInfo[] = MvcHelper.getApis(classz).map(apiInfo => ({
-      apiInfo: apiInfo,
+  public loadApiInfo(classz: ClassType) {
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(classz);
+    let controllerAnnotation: ControllerAnnotation = classMetadata.getClassAnnotation(ControllerAnnotation.className);
+    let controllerInfo: ControllerInfo = controllerAnnotation ? controllerAnnotation.controllerInfo : null;
+    let requestMappingAnnotations: RequestMappingAnnotation[] = classMetadata.getMethodAnnotations(RequestMappingAnnotation.className);
+    this._endpoints = requestMappingAnnotations.map(rma => ({
+      apiInfo: rma.apiInfo,
       controllerInfo: controllerInfo || {
         uri: '',
-        name: ObjectUtils.extractClassName(apiInfo.classz),
+        name: ObjectUtils.extractClassName(rma.apiInfo.classz),
         filters: [],
         registerParent: true,
-        classz: apiInfo.classz
+        classz: rma.apiInfo.classz
       }
     }));
-    this._endpoints = this._endpoints.concat(apisInClass);
   }
 
   public async registerApis(dependencyManager: DependencyManager) {
@@ -55,14 +57,13 @@ export class ExpressApiLoader implements ApiLoader {
     }
   }
 
-  private async resolveFilters(filters: (typeof BasicFilter | string)[], dependencyManager: DependencyManager) {
+  public static Builder(expressApp: any) {
+    return new ExpressApiLoaderBuilder(expressApp);
+  }
+
+  private async resolveFilters(filters: (BasicFilterType | string)[], dependencyManager: DependencyManager) {
     let filtersPromise = filters.map(async f => {
-      let filterName = f;
-      if (typeof f !== 'string') {
-        let filterInfo: FilterInfo = FilterHelper.getDeclaredFilter(f);
-        filterName = (filterInfo && filterInfo.name) || f;
-      }
-      let instance: BasicFilter = await dependencyManager.findOne(filterName);
+      let instance: BasicFilter = await dependencyManager.findOne(<ClassType | string>f);
       return instance.filter.bind(instance);
     });
     return Promise.all(filtersPromise);
@@ -94,5 +95,31 @@ export class ExpressApiLoader implements ApiLoader {
     }
     return uri1 + uri2;
   }
-
 }
+
+export class ExpressApiLoaderBuilder {
+  private _expressApp: any;
+  private _loggerFactory: LoggerFactory;
+
+  constructor(expressApp: any) {
+    this._expressApp = expressApp;
+  }
+
+  public withLoggerFactory(loggerFactory: LoggerFactory): ExpressApiLoaderBuilder {
+    this._loggerFactory = loggerFactory;
+    return this;
+  }
+
+  public get expressApp(): any {
+    return this._expressApp;
+  }
+
+  public get loggerFactory(): LoggerFactory {
+    return this._loggerFactory;
+  }
+
+  public build() {
+    return new ExpressApiLoader(this);
+  }
+}
+

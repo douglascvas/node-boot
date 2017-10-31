@@ -30,8 +30,8 @@ describe('AutoScannerClassProvider', function () {
       // given
       let file1 = Sinon.stub();
       let file2 = Sinon.stub();
-      let class1 = Sinon.stub();
-      let class2 = Sinon.stub();
+      let class1 = <any>Sinon.stub();
+      let class2 = <any>Sinon.stub();
       let autoScanOptions = {include: INCLUDE_PATHS, exclude: EXCLUDE_PATHS};
       autoScannerClassProvider = AutoScannerClassProvider.Builder(autoScanOptions).withFileScanner(fileManager)
         .withLoggerFactory(loggerFactory).build();

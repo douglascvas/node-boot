@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import {ControllerInfo} from "./ControllerInfo";
 import {ControllerOptions} from "./ControllerOptions";
-import {Service} from "../../dependencyManager/service/Service";
-
-const controllersMetadataKey = Symbol("controllersMD");
+import {ServiceAnnotation} from "../../dependencyManager/service/ServiceAnnotation";
+import {ClassType} from "../../ClassType";
+import {Annotation} from "../../core/Annotation";
 
 /**
  * Declares a class that will handle HTTP requests.
@@ -27,12 +27,7 @@ export function Controller(options: ControllerOptions | Function): any {
   let controllerOptions: ControllerOptions;
 
   function defineController(target: any) {
-    let controllerInfo: ControllerInfo = {
-      name: controllerOptions.name,
-      uri: controllerOptions.uri,
-      classz: target
-    };
-    Reflect.defineMetadata(controllersMetadataKey, controllerInfo, target)
+    new ControllerAnnotation(controllerOptions, target);
   }
 
   // If no parameters were given typescript passes the target as parameter
@@ -40,25 +35,28 @@ export function Controller(options: ControllerOptions | Function): any {
     let target = <Function>options;
     controllerOptions = {};
     defineController(target);
-    Service(target);
     return target;
   }
 
   controllerOptions = options || {};
 
-  return function (target) {
-    Service(controllerOptions)(target);
+  return function controllerFactory(target) {
     return defineController(target);
   }
 }
 
-export class ControllerHelper {
-  private static getMetadata(key, target, defaultValue) {
-    return Reflect.getMetadata(key, target) ||
-      Reflect.getMetadata(key, target.prototype || {}) || defaultValue;
-  }
 
-  public static getDeclaredController(target: any): ControllerInfo {
-    return ControllerHelper.getMetadata(controllersMetadataKey, target, null);
+export class ControllerAnnotation extends Annotation {
+  public readonly controllerInfo: ControllerInfo;
+
+  constructor(options: ControllerOptions, targetClass: ClassType) {
+    super();
+    this.controllerInfo = {
+      name: options.name,
+      uri: options.uri,
+      classz: targetClass
+    };
+    new ServiceAnnotation(options, targetClass);
+    this.annotateClass(targetClass);
   }
 }

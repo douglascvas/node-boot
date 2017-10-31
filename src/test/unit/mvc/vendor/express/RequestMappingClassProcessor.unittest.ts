@@ -8,18 +8,17 @@ import {ControllerLoader} from "../../../../../main/mvc/controller/ControllerLoa
 import {ExpressApiLoader} from "../../../../../main/mvc/vendor/express/ExpressApiLoader";
 import {DefaultDependencyManager} from "../../../../../main/dependencyManager/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../../TestLoggerFactory";
-import {ExpressWebManagerClassProcessor} from "../../../../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
+import {RequestMappingClassProcessor} from "../../../../../main/mvc/api/RequestMappingClassProcessor";
 import SinonStub = Sinon.SinonStub;
 
 const assert = chai.assert;
 
-describe('ExpressWebManagerClassProcessor', function () {
+describe('RequestMappingClassProcessor', function () {
 
   let expressApp: any,
     loggerFactory: LoggerFactory,
-    expressWebManagerClassProcessor: ExpressWebManagerClassProcessor,
+    requestMappingClassProcessor: RequestMappingClassProcessor,
     dependencyManager: DependencyManager,
-    controllerLoader: ControllerLoader,
     apiLoader: ExpressApiLoader;
 
   beforeEach(() => {
@@ -27,8 +26,7 @@ describe('ExpressWebManagerClassProcessor', function () {
     dependencyManager = Sinon.createStubInstance(DefaultDependencyManager);
     expressApp = {get: Sinon.stub(), post: Sinon.stub()};
     loggerFactory = new TestLoggerFactory();
-    expressWebManagerClassProcessor = ExpressWebManagerClassProcessor.Builder(expressApp)
-      .withApiLoader(apiLoader)
+    requestMappingClassProcessor = RequestMappingClassProcessor.Builder(apiLoader)
       .withLoggerFactory(loggerFactory)
       .build();
   });
@@ -36,7 +34,7 @@ describe('ExpressWebManagerClassProcessor', function () {
   describe('#onRegisterClass()', function () {
     it('should load API info', async function () {
       // when
-      await expressWebManagerClassProcessor.processClass(TestClass, dependencyManager);
+      await requestMappingClassProcessor.processClass(TestClass, dependencyManager);
 
       // then
       assert.isTrue((<SinonStub>apiLoader.loadApiInfo).withArgs(TestClass).calledOnce);
@@ -46,7 +44,7 @@ describe('ExpressWebManagerClassProcessor', function () {
   describe('#onLoad()', function () {
     it('should register all loaded APIs', async function () {
       // when
-      await expressWebManagerClassProcessor.onApplicationLoad(dependencyManager);
+      await requestMappingClassProcessor.onApplicationLoad(dependencyManager);
 
       // then
       assert.isTrue((<SinonStub>apiLoader.registerApis).withArgs(dependencyManager).calledOnce);

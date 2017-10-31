@@ -1,10 +1,11 @@
 'use strict';
 
 import * as chai from "chai";
-import {Filter, FilterHelper} from "../../../../main/mvc/filter/Filter";
+import {Filter, FilterAnnotation} from "../../../../main/mvc/filter/Filter";
 import {FilterInfo} from "../../../../main/mvc/filter/FilterInfo";
-import {ServiceHelper} from "../../../../main/dependencyManager/service/Service";
 import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";
+import {ServiceAnnotation} from "../../../../main/dependencyManager/service/ServiceAnnotation";
+import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;
 
@@ -12,8 +13,9 @@ describe('Filter', function () {
 
   it('should register filter without parameters', async function () {
     // given
-    let filter: FilterInfo = FilterHelper.getDeclaredFilter(FilterWithoutParameters);
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(FilterWithoutParameters);
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(FilterWithoutParameters);
+    let filter: FilterInfo = (<FilterAnnotation>classMetadata.getClassAnnotation(FilterAnnotation.className)).filterInfo;
+    let service: ServiceInfo = (<ServiceAnnotation>classMetadata.getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(filter.name, null);
@@ -27,8 +29,9 @@ describe('Filter', function () {
 
   it('should register filter with parameters', async function () {
     // given
-    let filter: FilterInfo = FilterHelper.getDeclaredFilter(FilterWithParameters);
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(FilterWithParameters);
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(FilterWithParameters);
+    let filter: FilterInfo = (<FilterAnnotation>classMetadata.getClassAnnotation(FilterAnnotation.className)).filterInfo;
+    let service: ServiceInfo = (<ServiceAnnotation>classMetadata.getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(filter.name, 'testFilter');
@@ -44,8 +47,9 @@ describe('Filter', function () {
 
   it('should register filter with name as parameter', async function () {
     // given
-    let filter: FilterInfo = FilterHelper.getDeclaredFilter(FilterWithNameAsParameter);
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(FilterWithNameAsParameter);
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(FilterWithNameAsParameter);
+    let filter: FilterInfo = (<FilterAnnotation>classMetadata.getClassAnnotation(FilterAnnotation.className)).filterInfo;
+    let service: ServiceInfo = (<ServiceAnnotation>classMetadata.getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(filter.name, 'namedFilter');

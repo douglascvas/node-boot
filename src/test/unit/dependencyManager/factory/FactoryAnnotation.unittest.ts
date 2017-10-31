@@ -2,15 +2,18 @@
 
 import * as chai from "chai";
 import {FactoryInfo} from "../../../../main/dependencyManager/factory/FactoryInfo";
-import {Factory, FactoryHelper} from "../../../../main/dependencyManager/factory/Factory";
+import {Factory, FactoryAnnotation} from "../../../../main/dependencyManager/factory/FactoryAnnotation";
+import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;
 
-describe('Factory', function () {
+describe('FactoryAnnotation', function () {
 
   it('should register factory with parameters', async function () {
     // given
-    let factories: FactoryInfo[] = FactoryHelper.getDeclaredFactories(FactoryTest);
+    let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
+      .getMethodAnnotations(FactoryAnnotation.className)
+      .map((a: FactoryAnnotation) => a.factoryInfo);
 
     // then
     assert.equal(factories[0].name, 'testFactory');
@@ -21,7 +24,9 @@ describe('Factory', function () {
 
   it('should register factory without parameters', async function () {
     // when
-    let factories: FactoryInfo[] = FactoryHelper.getDeclaredFactories(FactoryTest);
+    let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
+      .getMethodAnnotations(FactoryAnnotation.className)
+      .map((a: FactoryAnnotation) => a.factoryInfo);
 
     // then
     assert.equal(factories[1].name, null);
@@ -32,7 +37,9 @@ describe('Factory', function () {
 
   it('should register factory with name as parameter', async function () {
     // given
-    let factories: FactoryInfo[] = FactoryHelper.getDeclaredFactories(FactoryTest);
+    let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
+      .getMethodAnnotations(FactoryAnnotation.className)
+      .map((a: FactoryAnnotation) => a.factoryInfo);
 
     // then
     assert.equal(factories[2].name, 'namedFactory');

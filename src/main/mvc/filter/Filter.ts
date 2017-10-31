@@ -1,7 +1,9 @@
 import "reflect-metadata";
 import {FilterInfo} from "./FilterInfo";
 import {FilterOptions} from "./FilterOptions";
-import {Service} from "../../dependencyManager/service/Service";
+import {ServiceAnnotation} from "../../dependencyManager/service/ServiceAnnotation";
+import {Annotation} from "../../core/Annotation";
+import {ClassType} from "../../ClassType";
 
 const filtersMetadataKey = Symbol("filtersMD");
 
@@ -26,13 +28,8 @@ export function Filter(options: FilterOptions | string | Function): any {
    * Registers the metadata.
    */
   function defineFilter(target: any) {
-    let filterInfo: FilterInfo = {
-      name: filterOptions.name,
-      dependencies: filterOptions.dependencies,
-      skipParentRegistration: filterOptions.skipParentRegistration,
-      classz: target
-    };
-    Reflect.defineMetadata(filtersMetadataKey, filterInfo, target)
+    new FilterAnnotation(filterOptions, target);
+    return target;
   }
 
   // If no parameters were given typescript passes the target as parameter
@@ -40,7 +37,6 @@ export function Filter(options: FilterOptions | string | Function): any {
     let target = <Function>options;
     filterOptions.name = null;
     defineFilter(target);
-    Service(target);
     return target;
   }
 
@@ -52,21 +48,22 @@ export function Filter(options: FilterOptions | string | Function): any {
     filterOptions = options
   }
   return function (target) {
-    Service(filterOptions)(target);
     return defineFilter(target);
   };
 }
 
-/**
- * Helper class for getting the metadata information from the class.
- */
-export class FilterHelper {
-  private static getMetadata(key, target, defaultValue) {
-    return Reflect.getMetadata(key, target) ||
-      Reflect.getMetadata(key, target.prototype) || defaultValue;
-  }
+export class FilterAnnotation extends Annotation {
+  public readonly filterInfo: FilterInfo;
 
-  public static getDeclaredFilter(target: any): FilterInfo {
-    return FilterHelper.getMetadata(filtersMetadataKey, target, null);
+  constructor(filterOptions: FilterOptions, classz: ClassType) {
+    super();
+    this.filterInfo = {
+      name: filterOptions.name,
+      dependencies: filterOptions.dependencies,
+      skipParentRegistration: filterOptions.skipParentRegistration,
+      classz: classz
+    };
+    new ServiceAnnotation(filterOptions, classz);
+    this.annotateClass(classz);
   }
 }

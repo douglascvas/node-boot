@@ -6,7 +6,7 @@ import {DependencyManager} from "../../../../main/dependencyManager/DependencyMa
 import {LoggerFactory} from "../../../../main/logging/LoggerFactory";
 import {DefaultDependencyManager} from "../../../../main/dependencyManager/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../TestLoggerFactory";
-import {Service} from "../../../../main/dependencyManager/service/Service";
+import {Service} from "../../../../main/dependencyManager/service/ServiceAnnotation";
 import SinonStub = Sinon.SinonStub;
 
 describe('ServiceAnnotationClassProcessor', function () {

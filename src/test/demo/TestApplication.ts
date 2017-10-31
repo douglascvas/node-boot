@@ -4,7 +4,7 @@ import {TestServer} from "./TestServer";
 import {ApplicationManager} from "../../main/ApplicationManager";
 import * as express from "express";
 import {ClassProcessor} from "../../main/core/ClassProcessor";
-import {ExpressWebManagerClassProcessor} from "../../main/mvc/vendor/express/ExpressWebManagerClassProcessor";
+import {RequestMappingClassProcessor} from "../../main/mvc/api/RequestMappingClassProcessor";
 
 export class TestApplication {
   public expressApp: any;
@@ -15,7 +15,7 @@ export class TestApplication {
 
   public async start(): Promise<TestServer> {
     let loggerFactory: LoggerFactory = new TestLoggerFactory();
-    let expressWebManagerPlugin: ClassProcessor = ExpressWebManagerClassProcessor.Builder(this.expressApp)
+    let expressWebManagerPlugin: ClassProcessor = RequestMappingClassProcessor.Builder(this.expressApp)
       .withLoggerFactory(loggerFactory)
       .build();
 

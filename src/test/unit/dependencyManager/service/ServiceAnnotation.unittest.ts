@@ -2,15 +2,17 @@
 
 import * as chai from "chai";
 import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";
-import {Service, ServiceHelper} from "../../../../main/dependencyManager/service/Service";
+import {Service, ServiceAnnotation} from "../../../../main/dependencyManager/service/ServiceAnnotation";
+import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;
 
-describe('Service', function () {
+describe('ServiceAnnotation', function () {
 
   it('should register service without parameters', async function () {
     // when
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(ServiceWithoutParameters);
+    let service: ServiceInfo = (<ServiceAnnotation>ClassMetadata.getOrCreateClassMetadata(ServiceWithoutParameters)
+      .getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(service.name, null);
@@ -21,7 +23,8 @@ describe('Service', function () {
 
   it('should register service with parameters', async function () {
     // given
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(ServiceWithParameters);
+    let service: ServiceInfo = (<ServiceAnnotation>ClassMetadata.getOrCreateClassMetadata(ServiceWithParameters)
+      .getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(service.name, 'testService');
@@ -32,7 +35,8 @@ describe('Service', function () {
 
   it('should register service with name as parameter', async function () {
     // when
-    let service: ServiceInfo = ServiceHelper.getDeclaredService(ServiceWithNameAsParameter);
+    let service: ServiceInfo = (<ServiceAnnotation>ClassMetadata.getOrCreateClassMetadata(ServiceWithNameAsParameter)
+      .getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
 
     // then
     assert.equal(service.name, 'namedService');

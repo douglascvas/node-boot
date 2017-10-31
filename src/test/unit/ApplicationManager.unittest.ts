@@ -6,7 +6,7 @@ import {LoggerFactory} from "../../main/logging/LoggerFactory";
 import {DependencyManager} from "../../main/dependencyManager/DependencyManager";
 import {TestLoggerFactory} from "./TestLoggerFactory";
 import {DefaultDependencyManager} from "../../main/dependencyManager/DefaultDependencyManager";
-import {Service} from "../../main/dependencyManager/service/Service";
+import {Service} from "../../main/dependencyManager/service/ServiceAnnotation";
 import {ClassInfo} from "../../main/ClassInfo";
 import {ServiceAnnotationClassProcessor} from "../../main/dependencyManager/service/ServiceAnnotationClassProcessor";
 import {FactoryAnnotationClassProcessor} from "../../main/dependencyManager/factory/FactoryAnnotationClassProcessor";
@@ -14,6 +14,7 @@ import {AutoScannerClassProvider} from "../../main/core/autoScanner/AutoScannerC
 import {ClassProvider} from "../../main/core/ClassProvider";
 import {ClassProcessor} from "../../main/core/ClassProcessor";
 import SinonStub = Sinon.SinonStub;
+import {ClassType} from "../../main/ClassType";
 
 describe('ApplicationManager', function () {
 
@@ -127,7 +128,7 @@ describe('ApplicationManager', function () {
   describe('#registerService()', async function () {
     it('should register a service', async function () {
       // given
-      let service = Sinon.stub();
+      let service: ClassType = <any>Sinon.stub();
       let serviceInfo = {classz: service, name: UNIT_NAME};
 
       // when

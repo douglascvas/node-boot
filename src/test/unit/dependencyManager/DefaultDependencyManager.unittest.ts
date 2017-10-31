@@ -36,20 +36,6 @@ describe('DefaultDependencyManager', function () {
   });
 
   describe('#service', function () {
-    it('should register a service extracting name from parent class', async function () {
-      // given
-      await dependencyManager.service({classz: SpecialFoo});
-
-      // when
-      let foo: any = await dependencyManager.findOne('foo');
-      let specialFoo: any = await dependencyManager.findOne('specialFoo');
-
-      // then
-      assert.isTrue(!!foo);
-      assert.equal(foo.id, SPECIAL_FOO_ID);
-      assert.equal(foo, specialFoo);
-    });
-
     it('should register a service extracting name from class', async function () {
       // given
       await dependencyManager.service({classz: Foo});

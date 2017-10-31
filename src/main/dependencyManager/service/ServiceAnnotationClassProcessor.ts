@@ -5,7 +5,9 @@ import {ObjectUtils} from "../../ObjectUtils";
 import {ServiceInfo} from "./ServiceInfo";
 import {ClassProcessor} from "../../core/ClassProcessor";
 import {ConsoleLoggerFactory} from "../../logging/ConsoleLoggerFactory";
-import {ServiceHelper} from "./Service";
+import {ClassType} from "../../ClassType";
+import {ClassMetadata} from "../../core/ClassMetadata";
+import {ServiceAnnotation} from "./ServiceAnnotation";
 
 export class ServiceAnnotationClassProcessor implements ClassProcessor {
   private logger: Logger;
@@ -15,8 +17,10 @@ export class ServiceAnnotationClassProcessor implements ClassProcessor {
     this.logger = loggerFactory.getLogger(ServiceAnnotationClassProcessor);
   }
 
-  public async processClass(classz: Function, dependencyManager: DependencyManager): Promise<void> {
-    let serviceInfo: ServiceInfo = ServiceHelper.getDeclaredService(classz);
+  public async processClass(classz: ClassType, dependencyManager: DependencyManager): Promise<void> {
+    let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(classz);
+    let serviceAnnotation: ServiceAnnotation = classMetadata.getClassAnnotation(ServiceAnnotation.className);
+    let serviceInfo: ServiceInfo = serviceAnnotation ? serviceAnnotation.serviceInfo : null;
     if (serviceInfo) {
       this.logger.debug(`Registering @Service ${serviceInfo.name || ObjectUtils.extractClassName(serviceInfo.classz)}`);
       await dependencyManager.service(serviceInfo);

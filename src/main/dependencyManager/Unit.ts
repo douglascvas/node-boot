@@ -1,8 +1,9 @@
 'use strict';
+import {ClassType} from "../ClassType";
 
 export class Unit {
   public name: string;
-  public classz: Function;
+  public classz: ClassType;
 
   public instanceValue: any;
   public referencedBy: Set<Unit>;

@@ -14,8 +14,9 @@ import {FactoryAnnotationClassProcessor} from "./dependencyManager/factory/Facto
 import {AutoScannerClassProvider} from "./core/autoScanner/AutoScannerClassProvider";
 import {ServiceInfo} from "./dependencyManager/service/ServiceInfo";
 import {FactoryInfo} from "./dependencyManager/factory/FactoryInfo";
-import {ServiceHelper} from "./dependencyManager/service/Service";
 import {ApplicationConfig} from "./ApplicationConfig";
+import {ClassType} from "./ClassType";
+import {ServiceAnnotation} from "./dependencyManager/service/ServiceAnnotation";
 
 sourceMapSupport.install();
 
@@ -28,7 +29,7 @@ export class ApplicationManager {
   private _mainApplicationInstance: any;
   private _dependencyManager: DependencyManager;
   private _classProviders: Set<ClassProvider>;
-  private _registeredClasses: Set<Function>;
+  private _registeredClasses: Set<ClassType>;
   private _autoScannerClassProvider: AutoScannerClassProvider;
   private _applicationConfig: ApplicationConfig;
 
@@ -72,10 +73,11 @@ export class ApplicationManager {
     return this._applicationConfig;
   }
 
-  public async registerService(serviceInfo: ServiceInfo | Function): Promise<void> {
+  public async registerService(serviceInfo: ServiceInfo | ClassType): Promise<void> {
     let info: ServiceInfo;
     if (serviceInfo instanceof Function) {
-      info = ServiceHelper.getDeclaredService(serviceInfo) || {classz: serviceInfo};
+      let serviceAnnotation: ServiceAnnotation = <ServiceAnnotation>ServiceAnnotation.getClassAnnotationsFrom(serviceInfo)[0];
+      info = serviceAnnotation ? serviceAnnotation.serviceInfo : {classz: serviceInfo};
     } else {
       info = serviceInfo;
     }

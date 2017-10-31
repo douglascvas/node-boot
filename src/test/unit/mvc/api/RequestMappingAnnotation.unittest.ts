@@ -1,25 +1,24 @@
 'use strict';
 
-import * as Sinon from "sinon";
 import * as chai from "chai";
-import {MvcHelper, RequestMapping} from "../../../../main/mvc/api/RequestMapping";
-import SinonSpy = Sinon.SinonSpy;
-import SinonStub = Sinon.SinonStub;
 import {RequestType} from "../../../../main/mvc/api/RequestType";
 import {ApiInfo} from "../../../../main/mvc/api/ApiInfo";
+import {ClassMetadata} from "../../../../main/core/ClassMetadata";
+import {RequestMapping, RequestMappingAnnotation} from "../../../../main/mvc/api/RequestMappingAnnotation";
 
 const assert = chai.assert;
 
-describe('RequestMapping', function () {
+describe('RequestMappingAnnotation', function () {
 
   beforeEach(() => {
-
   });
 
   describe('# @RequestMapping', function () {
     it('should register api', async function () {
       // given
-      let apis: ApiInfo[] = MvcHelper.getApis(TestClass);
+      let classMetadata = ClassMetadata.getOrCreateClassMetadata(TestClass);
+      let apis: ApiInfo[] = classMetadata.getMethodAnnotations(RequestMappingAnnotation.className)
+        .map((a: RequestMappingAnnotation) => a.apiInfo);
 
       // then
       assert.equal(apis.length, 2);
