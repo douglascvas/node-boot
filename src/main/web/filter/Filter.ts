@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {FilterInfo} from "./FilterInfo";
 import {FilterOptions} from "./FilterOptions";
-import {ServiceAnnotation} from "../../dependencyManager/service/ServiceAnnotation";
+import {ServiceAnnotation} from "../../di/service/ServiceAnnotation";
 import {Annotation} from "../../core/Annotation";
 import {ClassType} from "../../ClassType";
 

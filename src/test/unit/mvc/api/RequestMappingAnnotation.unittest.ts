@@ -1,10 +1,10 @@
 'use strict';
 
 import * as chai from "chai";
-import {RequestType} from "../../../../main/mvc/api/RequestType";
-import {ApiInfo} from "../../../../main/mvc/api/ApiInfo";
+import {RequestType} from "../../../../main/web/api/RequestType";
+import {ApiInfo} from "../../../../main/web/api/ApiInfo";
 import {ClassMetadata} from "../../../../main/core/ClassMetadata";
-import {RequestMapping, RequestMappingAnnotation} from "../../../../main/mvc/api/RequestMappingAnnotation";
+import {RequestMapping, RequestMappingAnnotation} from "../../../../main/web/api/RequestMappingAnnotation";
 
 const assert = chai.assert;
 

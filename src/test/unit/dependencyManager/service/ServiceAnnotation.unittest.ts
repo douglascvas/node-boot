@@ -1,8 +1,8 @@
 'use strict';
 
 import * as chai from "chai";
-import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";
-import {Service, ServiceAnnotation} from "../../../../main/dependencyManager/service/ServiceAnnotation";
+import {ServiceInfo} from "../../../../main/di/service/ServiceInfo";
+import {Service, ServiceAnnotation} from "../../../../main/di/service/ServiceAnnotation";
 import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;

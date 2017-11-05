@@ -1,10 +1,10 @@
 'use strict';
 
 import * as chai from "chai";
-import {Filter, FilterAnnotation} from "../../../../main/mvc/filter/Filter";
-import {FilterInfo} from "../../../../main/mvc/filter/FilterInfo";
-import {ServiceInfo} from "../../../../main/dependencyManager/service/ServiceInfo";
-import {ServiceAnnotation} from "../../../../main/dependencyManager/service/ServiceAnnotation";
+import {Filter, FilterAnnotation} from "../../../../main/web/filter/Filter";
+import {FilterInfo} from "../../../../main/web/filter/FilterInfo";
+import {ServiceInfo} from "../../../../main/di/service/ServiceInfo";
+import {ServiceAnnotation} from "../../../../main/di/service/ServiceAnnotation";
 import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;

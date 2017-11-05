@@ -1,9 +1,9 @@
-import {Controller} from "../../main/mvc/controller/ControllerAnnotation";
+import {Controller} from "../../main/web/controller/ControllerAnnotation";
 import {CalculationService} from "./CalculationService";
-import {RequestMapping} from "../../main/mvc/api/RequestMappingAnnotation";
-import {ResponseBody} from "../../main/mvc/api/ResponseBodyAnnotation";
+import {RequestMapping} from "../../main/web/api/RequestMappingAnnotation";
+import {ResponseBody} from "../../main/web/api/ResponseBodyAnnotation";
 import {TestFilter} from "./PositiveValueFilter";
-import {RequestType} from "../../main/mvc/api/RequestType";
+import {RequestType} from "../../main/web/api/RequestType";
 
 @Controller({uri: "/calculation"})
 export class CalculationController {

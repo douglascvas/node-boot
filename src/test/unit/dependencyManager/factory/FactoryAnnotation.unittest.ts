@@ -1,8 +1,8 @@
 'use strict';
 
 import * as chai from "chai";
-import {FactoryInfo} from "../../../../main/dependencyManager/factory/FactoryInfo";
-import {Factory, FactoryAnnotation} from "../../../../main/dependencyManager/factory/FactoryAnnotation";
+import {FactoryInfo} from "../../../../main/di/factory/FactoryInfo";
+import {Factory, FactoryAnnotation} from "../../../../main/di/factory/FactoryAnnotation";
 import {ClassMetadata} from "../../../../main/core/ClassMetadata";
 
 const assert = chai.assert;

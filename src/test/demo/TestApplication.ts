@@ -1,10 +1,9 @@
 import {LoggerFactory} from "../../main/logging/LoggerFactory";
 import {TestLoggerFactory} from "../unit/TestLoggerFactory";
 import {TestServer} from "./TestServer";
-import {ApplicationManager} from "../../main/ApplicationManager";
 import * as express from "express";
-import {ClassProcessor} from "../../main/core/ClassProcessor";
-import {RequestMappingClassProcessor} from "../../main/mvc/api/RequestMappingClassProcessor";
+import {NodeBootApplication} from "../../main/NodeBootApplication";
+import {ExpressWebModule} from "../../main/web/vendor/express/ExpressWebModule";
 
 export class TestApplication {
   public expressApp: any;
@@ -15,19 +14,23 @@ export class TestApplication {
 
   public async start(): Promise<TestServer> {
     let loggerFactory: LoggerFactory = new TestLoggerFactory();
-    let expressWebManagerPlugin: ClassProcessor = RequestMappingClassProcessor.Builder(this.expressApp)
-      .withLoggerFactory(loggerFactory)
-      .build();
 
-    let applicationManager: ApplicationManager = ApplicationManager.Builder(TestServer)
-      .withLoggerFactory(loggerFactory)
-      .withClassProcessors(expressWebManagerPlugin)
-      .build();
+    let applicationConfig = {
+      nodeBoot: {
+        core: {
+          autoScan: {
+            enabled: true,
+            include: [`${__dirname}/**/*.ts`],
+            exclude: ['./node_modules/**']
+          }
+        }
+      }
+    };
 
-    applicationManager.configuration().enableAutoScan(`${__dirname}/**/*.ts`, './node_modules/**');
-
-    await applicationManager.registerValue("app", this.expressApp);
-    let server: TestServer = await applicationManager.bootstrap();
-    return server;
+    let webModule = new ExpressWebModule(this.expressApp);
+    return await new NodeBootApplication({mainApplicationClass: TestServer, applicationConfig, loggerFactory})
+      .useModule(webModule)
+      .run();
   }
 }
+

@@ -15,12 +15,12 @@ export class DefaultDependencyManager implements DependencyManager {
   private _units: Map<string, Unit>;
   private _objectFactory: ObjectFactory;
 
-  constructor(private builder: DefaultDependencyManagerBuilder) {
-    let loggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
+  constructor(options: DefaultDependencyManagerOptions) {
+    let loggerFactory = options.loggerFactory || new ConsoleLoggerFactory();
     this._logger = loggerFactory.getLogger(DefaultDependencyManager);
     this._translationMap = new Map();
     this._units = new Map();
-    this._objectFactory = builder.objectFactory || new ObjectFactory();
+    this._objectFactory = options.objectFactory || new ObjectFactory();
     this.value('dependencyManager', this);
   }
 
@@ -213,73 +213,10 @@ export class DefaultDependencyManager implements DependencyManager {
     }
     unit.resolved = true;
   }
-
-  public static Builder(): DefaultDependencyManagerBuilder {
-    return new DefaultDependencyManagerBuilder();
-  }
-
-  // private async resolveReferences(unit: Unit, resolveQueue: string[] = []): Promise<void> {
-  //   let references = Array.from(unit.referencedBy)
-  //     .map(value => value[1])
-  //     .map((referencer: Unit) => this.resolve(referencer, resolveQueue));
-  //   await Promise.all(references);
-  // }
-  //
-  // private getParentName(classz) {
-  //   if (!classz) {
-  //     return null;
-  //   }
-  //   return Object.getPrototypeOf(classz).name;
-  // }
-  //   return !unit.classz && !unit.factory && !unit.resolved;
-  // }
-  //
-  // private assertIsFunction(value: Object, errorMessage: string) {
-  //   if (typeof value !== 'function') {
-  //     throw new Error(errorMessage);
-  //   }
-  // }
-  //
-  // private getFunctionName(classz: any) {
-  //   if (typeof classz !== 'string') {
-  //     return ObjectUtils.extractClassName(classz);
-  //   }
-  //   return classz;
-  // public findAll(): UnitInfo[] {
-  //   return this.getUnitsWithResolvedStatusAs(true).map((unit: Unit) => ({
-  //     name: unit.name,
-  //     value: unit.instanceValue,
-  //     classz: unit.classz
-  //   }));
-  // }
-  // }
-  //
 }
 
-export class DefaultDependencyManagerBuilder {
-  private _loggerFactory: LoggerFactory;
-  private _objectFactory: ObjectFactory;
-
-  get loggerFactory(): LoggerFactory {
-    return this._loggerFactory;
-  }
-
-  get objectFactory(): ObjectFactory {
-    return this._objectFactory;
-  }
-
-  public withLoggerFactory(value: LoggerFactory): DefaultDependencyManagerBuilder {
-    this._loggerFactory = value;
-    return this;
-  }
-
-  public withObjectFactory(value: ObjectFactory): DefaultDependencyManagerBuilder {
-    this._objectFactory = value;
-    return this;
-  }
-
-  public build(): DefaultDependencyManager {
-    return new DefaultDependencyManager(this);
-  }
+export interface DefaultDependencyManagerOptions {
+  loggerFactory?: LoggerFactory;
+  objectFactory?: ObjectFactory;
 }
 

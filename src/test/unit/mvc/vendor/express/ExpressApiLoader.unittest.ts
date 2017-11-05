@@ -2,15 +2,15 @@
 
 import * as Sinon from "sinon";
 import * as chai from "chai";
-import {ExpressApiLoader} from "../../../../../main/mvc/vendor/express/ExpressApiLoader";
-import {DependencyManager} from "../../../../../main/dependencyManager/DependencyManager";
+import {ExpressApiLoader} from "../../../../../main/web/vendor/express/ExpressApiLoader";
+import {DependencyManager} from "../../../../../main/di/DependencyManager";
 import {LoggerFactory} from "../../../../../main/logging/LoggerFactory";
-import {DefaultDependencyManager} from "../../../../../main/dependencyManager/DefaultDependencyManager";
+import {DefaultDependencyManager} from "../../../../../main/di/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../../TestLoggerFactory";
-import {Controller} from "../../../../../main/mvc/controller/ControllerAnnotation";
-import {RequestMapping} from "../../../../../main/mvc/api/RequestMappingAnnotation";
-import {RequestType} from "../../../../../main/mvc/api/RequestType";
-import {BasicFilter} from "../../../../../main/mvc/filter/BasicFilter";
+import {Controller} from "../../../../../main/web/controller/ControllerAnnotation";
+import {RequestMapping} from "../../../../../main/web/api/RequestMappingAnnotation";
+import {RequestType} from "../../../../../main/web/api/RequestType";
+import {BasicFilter} from "../../../../../main/web/filter/BasicFilter";
 import SinonStub = Sinon.SinonStub;
 
 const assert = chai.assert;

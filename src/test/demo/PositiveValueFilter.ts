@@ -1,5 +1,5 @@
-import {Filter} from "../../main/mvc/filter/Filter";
-import {BasicFilter} from "../../main/mvc/filter/BasicFilter";
+import {Filter} from "../../main/web/filter/Filter";
+import {BasicFilter} from "../../main/web/filter/BasicFilter";
 import * as express from 'express';
 
 @Filter

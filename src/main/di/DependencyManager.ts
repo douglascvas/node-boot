@@ -11,6 +11,4 @@ export interface DependencyManager {
   factory(factoryInfo: FactoryInfo): Promise<void>;
 
   findOne(name: string | ClassType): Promise<any>;
-
-  // findAll(): UnitInfo[];
 }

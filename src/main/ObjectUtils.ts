@@ -92,4 +92,29 @@ export class ObjectUtils {
   public static flattenMapValues(map: Map<any, any[]>) {
     return Array.from(map.values()).reduce((a, b) => a.concat(b), [])
   }
+
+  public static getValue(object: Object, path: string): any {
+    let parts = path.split('.');
+    let result = object;
+    for (let i = 0; i < parts.length; i++) {
+      let part = parts[i];
+      if (Reflect.has(result, part)) {
+        result = result[part];
+      } else {
+        let found = false;
+        for (let j = i; j < parts.length; j++, i++) {
+          part = `${part}.${parts[j]}`;
+          if (Reflect.has(result, part)) {
+            result = result[part];
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          return undefined;
+        }
+      }
+    }
+    return result;
+  }
 }

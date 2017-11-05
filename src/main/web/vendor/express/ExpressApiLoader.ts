@@ -1,4 +1,4 @@
-import {DependencyManager} from "../../../dependencyManager/DependencyManager";
+import {DependencyManager} from "../../../di/DependencyManager";
 import {LoggerFactory} from "../../../logging/LoggerFactory";
 import {Logger} from "../../../logging/Logger";
 import {ObjectUtils} from "../../../ObjectUtils";

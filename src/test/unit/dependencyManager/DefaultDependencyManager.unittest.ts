@@ -2,7 +2,7 @@
 
 import * as chai from "chai";
 import {LoggerFactory} from "../../../main/logging/LoggerFactory";
-import {DefaultDependencyManager} from "../../../main/dependencyManager/DefaultDependencyManager";
+import {DefaultDependencyManager} from "../../../main/di/DefaultDependencyManager";
 import {TestLoggerFactory} from "../TestLoggerFactory";
 
 const assert = chai.assert;
@@ -18,7 +18,7 @@ describe('DefaultDependencyManager', function () {
 
   beforeEach(() => {
     loggerFactory = new TestLoggerFactory();
-    dependencyManager = DefaultDependencyManager.Builder().withLoggerFactory(loggerFactory).build();
+    dependencyManager = new DefaultDependencyManager({loggerFactory});
   });
 
   describe('#value', function () {

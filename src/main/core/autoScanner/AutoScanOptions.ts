@@ -1,4 +1,5 @@
 export interface AutoScanOptions {
-  include: string|(string[]),
-  exclude?: string|(string[])
+  enabled: boolean,
+  include: string | (string[]),
+  exclude?: string | (string[])
 }

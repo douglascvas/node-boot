@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import {ControllerInfo} from "./ControllerInfo";
 import {ControllerOptions} from "./ControllerOptions";
-import {ServiceAnnotation} from "../../dependencyManager/service/ServiceAnnotation";
+import {ServiceAnnotation} from "../../di/service/ServiceAnnotation";
 import {ClassType} from "../../ClassType";
 import {Annotation} from "../../core/Annotation";
 

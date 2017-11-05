@@ -1,30 +1,32 @@
 'use strict';
 
 import * as Sinon from "sinon";
-import {ApplicationManager} from "../../main/ApplicationManager";
 import {LoggerFactory} from "../../main/logging/LoggerFactory";
-import {DependencyManager} from "../../main/dependencyManager/DependencyManager";
+import {DependencyManager} from "../../main/di/DependencyManager";
 import {TestLoggerFactory} from "./TestLoggerFactory";
-import {DefaultDependencyManager} from "../../main/dependencyManager/DefaultDependencyManager";
-import {Service} from "../../main/dependencyManager/service/ServiceAnnotation";
+import {DefaultDependencyManager} from "../../main/di/DefaultDependencyManager";
+import {Service} from "../../main/di/service/ServiceAnnotation";
 import {ClassInfo} from "../../main/ClassInfo";
-import {ServiceAnnotationClassProcessor} from "../../main/dependencyManager/service/ServiceAnnotationClassProcessor";
-import {FactoryAnnotationClassProcessor} from "../../main/dependencyManager/factory/FactoryAnnotationClassProcessor";
+import {ServiceAnnotationClassProcessor} from "../../main/di/service/ServiceAnnotationClassProcessor";
+import {FactoryAnnotationClassProcessor} from "../../main/di/factory/FactoryAnnotationClassProcessor";
 import {AutoScannerClassProvider} from "../../main/core/autoScanner/AutoScannerClassProvider";
 import {ClassProvider} from "../../main/core/ClassProvider";
 import {ClassProcessor} from "../../main/core/ClassProcessor";
-import SinonStub = Sinon.SinonStub;
 import {ClassType} from "../../main/ClassType";
+import {NodeBootApplication} from "../../main/NodeBootApplication";
+import {ClassProcessorManager} from "../../main/ClassProcessorManager";
+import SinonStub = Sinon.SinonStub;
+import {ClassProviderManager} from "../../main/ClassProviderManager";
 
 describe('ApplicationManager', function () {
 
-  let appManager: ApplicationManager;
+  let appManager: NodeBootApplication;
   let loggerFactory: LoggerFactory;
   let dependencyManager: DependencyManager;
   let serviceAnnotationClassProcessor: ServiceAnnotationClassProcessor;
   let factoryAnnotationClassProcessor: FactoryAnnotationClassProcessor;
-  let autoScannerClassProvider: AutoScannerClassProvider;
-  let classProvider1: ClassProvider;
+  let classProcessorManager: ClassProcessorManager;
+  let classProviderManager: ClassProviderManager;
   let classProvider2: ClassProvider;
   let testClassProcessor: ClassProcessor;
   const UNIT_NAME = "test1";
@@ -32,28 +34,18 @@ describe('ApplicationManager', function () {
   beforeEach(() => {
     serviceAnnotationClassProcessor = Sinon.createStubInstance(ServiceAnnotationClassProcessor);
     factoryAnnotationClassProcessor = Sinon.createStubInstance(FactoryAnnotationClassProcessor);
-    autoScannerClassProvider = Sinon.createStubInstance(AutoScannerClassProvider);
-    classProvider1 = Sinon.createStubInstance(TestClassProviderImpl);
-    classProvider2 = Sinon.createStubInstance(TestClassProviderImpl);
+    classProcessorManager = Sinon.createStubInstance(AutoScannerClassProvider);
     testClassProcessor = Sinon.createStubInstance(TestClassProcessorImpl);
 
     dependencyManager = Sinon.createStubInstance(DefaultDependencyManager);
     loggerFactory = new TestLoggerFactory();
-    appManager = ApplicationManager.Builder(TestClassMain)
-      .withLoggerFactory(loggerFactory)
-      .withDependencyManager(dependencyManager)
-      .withServiceAnnotationClassProcessor(serviceAnnotationClassProcessor)
-      .withFactoryAnnotationClassProcessor(factoryAnnotationClassProcessor)
-      .withAutoScannerClassProvider(autoScannerClassProvider)
-      .withClassProviders([classProvider1, classProvider2])
-      .withClassProcessors(testClassProcessor)
-      .build();
+    appManager = new NodeBootApplication({mainApplicationClass: TestClassMain, loggerFactory, classProcessorManager, classProviderManager});
   });
 
   describe('#bootstrap()', function () {
     it('should register main class', async function () {
       // when
-      await appManager.bootstrap();
+      await appManager.run();
 
       // then
       Sinon.assert.calledWith(<SinonStub>dependencyManager.service, {classz: TestClassMain, name: 'main'});

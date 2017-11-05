@@ -9,16 +9,23 @@ import {FileScanner} from "./FileScanner";
 import {ClassProvider} from "../ClassProvider";
 import {ClassType} from "../../ClassType";
 
+export interface AutoScannerClassProviderOptions {
+  autoScanOptions?: AutoScanOptions;
+  fileScanner?: FileScanner;
+  loggerFactory?: LoggerFactory;
+}
+
 export class AutoScannerClassProvider implements ClassProvider {
   private _logger: Logger;
   private _fileScanner: FileScanner;
   private _autoScanInfo: AutoScanOptions;
 
-  constructor(builder: AutoScannerClassProviderBuilder) {
-    let loggerFactory = builder.loggerFactory || new ConsoleLoggerFactory();
+  constructor(options: AutoScannerClassProviderOptions = {}) {
+    let loggerFactory = options.loggerFactory || new ConsoleLoggerFactory();
     this._logger = loggerFactory.getLogger(AutoScannerClassProvider);
-    this._fileScanner = builder.fileScanner || new FileScanner();
-    this._autoScanInfo = builder.autoScanInfo || {
+    this._fileScanner = options.fileScanner || new FileScanner();
+    this._autoScanInfo = options.autoScanOptions || {
+      enabled: false,
       include: ["./*.js"]
     };
   }
@@ -67,45 +74,5 @@ export class AutoScannerClassProvider implements ClassProvider {
     for (let entry of entries) {
       result.set(entry.key, entry.value);
     }
-  }
-
-  public static Builder(autoScanInfo: AutoScanOptions): AutoScannerClassProviderBuilder {
-    return new AutoScannerClassProviderBuilder(autoScanInfo);
-  }
-}
-
-export class AutoScannerClassProviderBuilder {
-  private _autoScanInfo: AutoScanOptions;
-  private _fileScanner: FileScanner;
-  private _loggerFactory: LoggerFactory;
-
-  constructor(autoScanInfo: AutoScanOptions) {
-    this._autoScanInfo = autoScanInfo;
-  }
-
-  public get autoScanInfo(): AutoScanOptions {
-    return this._autoScanInfo;
-  }
-
-  public get fileScanner(): FileScanner {
-    return this._fileScanner;
-  }
-
-  public withFileScanner(value: FileScanner): AutoScannerClassProviderBuilder {
-    this._fileScanner = value;
-    return this;
-  }
-
-  public get loggerFactory(): LoggerFactory {
-    return this._loggerFactory;
-  }
-
-  public withLoggerFactory(value: LoggerFactory): AutoScannerClassProviderBuilder {
-    this._loggerFactory = value;
-    return this;
-  }
-
-  public build(): AutoScannerClassProvider {
-    return new AutoScannerClassProvider(this);
   }
 }

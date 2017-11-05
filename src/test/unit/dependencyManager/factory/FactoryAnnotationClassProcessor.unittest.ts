@@ -2,12 +2,12 @@
 
 import * as Sinon from "sinon";
 import * as chai from "chai";
-import {DependencyManager} from "../../../../main/dependencyManager/DependencyManager";
+import {DependencyManager} from "../../../../main/di/DependencyManager";
 import {LoggerFactory} from "../../../../main/logging/LoggerFactory";
-import {DefaultDependencyManager} from "../../../../main/dependencyManager/DefaultDependencyManager";
+import {DefaultDependencyManager} from "../../../../main/di/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../TestLoggerFactory";
-import {FactoryAnnotationClassProcessor} from "../../../../main/dependencyManager/factory/FactoryAnnotationClassProcessor";
-import {Factory} from "../../../../main/dependencyManager/factory/FactoryAnnotation";
+import {FactoryAnnotationClassProcessor} from "../../../../main/di/factory/FactoryAnnotationClassProcessor";
+import {Factory} from "../../../../main/di/factory/FactoryAnnotation";
 import SinonStub = Sinon.SinonStub;
 
 const assert = chai.assert;
@@ -21,15 +21,13 @@ describe('FactoryAnnotationClassProcessor', function () {
   beforeEach(() => {
     dependencyManager = Sinon.createStubInstance(DefaultDependencyManager);
     loggerFactory = new TestLoggerFactory();
-    factoryAnnotationClassProcessor = FactoryAnnotationClassProcessor.Builder()
-      .withLoggerFactory(loggerFactory)
-      .build();
+    factoryAnnotationClassProcessor = new FactoryAnnotationClassProcessor({dependencyManager, loggerFactory});
   });
 
   describe('#onRegisterClass()', function () {
     it('should methods annotated with @Factory', async function () {
       // when
-      await factoryAnnotationClassProcessor.processClass(TestClass, dependencyManager);
+      await factoryAnnotationClassProcessor.processClass(TestClass);
 
       // then
       assertFactoryIsRegistered('byFactory', TestClass.prototype.create);

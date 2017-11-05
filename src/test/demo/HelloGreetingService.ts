@@ -1,5 +1,5 @@
 import {GreetingService} from "./GreetingService";
-import {Service} from "../../main/dependencyManager/service/ServiceAnnotation";
+import {Service} from "../../main/di/service/ServiceAnnotation";
 
 @Service
 export class HelloGreetingService extends GreetingService {
