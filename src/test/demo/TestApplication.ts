@@ -1,18 +1,17 @@
 import {LoggerFactory} from "../../main/logging/LoggerFactory";
 import {TestLoggerFactory} from "../unit/TestLoggerFactory";
 import {TestServer} from "./TestServer";
-import * as express from "express";
 import {NodeBootApplication} from "../../main/NodeBootApplication";
 import {ExpressWebModule} from "../../main/web/vendor/express/ExpressWebModule";
+import {ApplicationContext} from "../../main/ApplicationContext";
 
 export class TestApplication {
-  public expressApp: any;
+
 
   constructor() {
-    this.expressApp = express();
   }
 
-  public async start(): Promise<TestServer> {
+  public async start(): Promise<ApplicationContext> {
     let loggerFactory: LoggerFactory = new TestLoggerFactory();
 
     let applicationConfig = {
@@ -27,9 +26,12 @@ export class TestApplication {
       }
     };
 
-    let webModule = new ExpressWebModule(this.expressApp);
-    return await new NodeBootApplication({mainApplicationClass: TestServer, applicationConfig, loggerFactory})
-      .useModule(webModule)
+    return await new NodeBootApplication({
+      mainApplicationClass: TestServer,
+      applicationConfig,
+      loggerFactory
+    })
+      .usingModule(new ExpressWebModule({expressApp: 'app'}))
       .run();
   }
 }

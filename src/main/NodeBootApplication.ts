@@ -1,23 +1,19 @@
 import * as sourceMapSupport from "source-map-support";
-import {ClassProcessor} from "./core/ClassProcessor";
 import {LoggerFactory} from "./logging/LoggerFactory";
 import {DependencyManager} from "./di/DependencyManager";
 import {ConsoleLoggerFactory} from "./logging/ConsoleLoggerFactory";
 import {Logger} from "./logging/Logger";
 import * as assert from "assert";
-import {ClassProvider} from "./core/ClassProvider";
 import {ClassInfo} from "./ClassInfo";
-import {ServiceInfo} from "./di/service/ServiceInfo";
+import {InjectableInfo} from "./di/injectable/InjectableInfo";
 import {FactoryInfo} from "./di/factory/FactoryInfo";
 import {ClassType} from "./ClassType";
-import {ServiceAnnotation} from "./di/service/ServiceAnnotation";
-import {ClassProviderManager} from "./ClassProviderManager";
-import {ClassProcessorManager} from "./ClassProcessorManager";
-import {ApplicationManager} from "./ApplicationManager";
 import {ApplicationModule} from "./ApplicationModule";
 import {DependencyInjectionModule} from "./di/DependencyInjectionModule";
 import {CoreModule} from "./core/CoreModule";
-import {NodeBootDiModule} from "./di/NodeBootDiModule";
+import {ApplicationContext} from "./ApplicationContext";
+import {ModuleContext} from "./ModuleContext";
+import {InjectableAnnotation} from "./di/injectable/InjectableAnnotation";
 
 sourceMapSupport.install();
 
@@ -25,13 +21,14 @@ export interface NodeBootApplicationOptions {
   mainApplicationClass: ClassType,
   loggerFactory?: LoggerFactory,
   applicationConfig?: Object,
-  classProviderManager?: ClassProviderManager,
-  classProcessorManager?: ClassProcessorManager,
   dependencyInjectionModule?: DependencyInjectionModule,
-  coreModule?: ApplicationModule
+  coreModule?: CoreModule
 }
 
-export class NodeBootApplication implements ApplicationManager {
+export type FactoryParam = FactoryInfo | Function;
+export type ServiceParam = InjectableInfo | Function;
+
+export class NodeBootApplication {
 
   private _logger: Logger;
   private _loggerFactory: LoggerFactory;
@@ -42,9 +39,6 @@ export class NodeBootApplication implements ApplicationManager {
   private _registeredClasses: Set<ClassInfo>;
   private _dependencyManager: DependencyManager;
 
-  private _classProviderManager: ClassProviderManager;
-  private _classProcessorManager: ClassProcessorManager;
-
   constructor(options: NodeBootApplicationOptions) {
     let loggerFactory: LoggerFactory = options.loggerFactory || new ConsoleLoggerFactory();
 
@@ -54,60 +48,38 @@ export class NodeBootApplication implements ApplicationManager {
     this._logger = loggerFactory.getLogger(NodeBootApplication);
     this._loggerFactory = loggerFactory;
     this._applicationConfig = options.applicationConfig || {};
-    this._classProviderManager = options.classProviderManager || new ClassProviderManager();
-    this._classProcessorManager = options.classProcessorManager || new ClassProcessorManager();
     this._registeredClasses = new Set();
     this._applicationModules = new Set();
 
-    let coreModule: ApplicationModule = options.coreModule || new CoreModule({loggerFactory: loggerFactory});
+    let coreModule: CoreModule = options.coreModule || new CoreModule({loggerFactory: loggerFactory});
+    this._dependencyManager = coreModule.dependencyManager;
     this._applicationModules.add(coreModule);
-
-    let dependencyInjectionModule: DependencyInjectionModule = options.dependencyInjectionModule || new NodeBootDiModule({loggerFactory});
-    this._applicationModules.add(dependencyInjectionModule);
-
-    this._dependencyManager = dependencyInjectionModule.dependencyManager;
   }
 
-  public getDependencyManager(): DependencyManager {
-    return this._dependencyManager;
-  }
-
-  public getMainApplicationClass(): ClassType {
-    return this._mainApplicationClass;
-  }
-
-  public getApplicationConfig(): Object {
-    return this._applicationConfig;
-  }
-
-  public async registerClassProcessor(...classProcessor: ClassProcessor[]) {
-    this._classProcessorManager.registerClassProcessor(...classProcessor);
-  }
-
-  public async registerClassProvider(...classProvider: ClassProvider[]) {
-    this._classProviderManager.registerClassProvider(...classProvider);
-  }
-
-  public async registerService(serviceInfo: ServiceInfo | ClassType): Promise<void> {
-    let info: ServiceInfo;
-    if (serviceInfo instanceof Function) {
-      let serviceAnnotation: ServiceAnnotation = <ServiceAnnotation>ServiceAnnotation.getClassAnnotationsFrom(serviceInfo)[0];
-      info = serviceAnnotation ? serviceAnnotation.serviceInfo : {classz: serviceInfo};
-    } else {
-      info = serviceInfo;
+  public async registerService(...serviceInfo: ServiceParam[]): Promise<void> {
+    for (let service of serviceInfo) {
+      let info: InjectableInfo;
+      if (service instanceof Function) {
+        let serviceAnnotation: InjectableAnnotation = <InjectableAnnotation>InjectableAnnotation.getClassAnnotationsFrom(<any>service)[0];
+        info = serviceAnnotation ? serviceAnnotation.injectableInfo : {classz: <any>service};
+      } else {
+        info = service;
+      }
+      this._registeredClasses.add({name: info.name, classz: info.classz});
+      await this._dependencyManager.injectable(info);
     }
-    this._registeredClasses.add({name: info.name, classz: info.classz});
-    await this._dependencyManager.service(info);
   }
 
-  public async registerFactory(factoryInfo: FactoryInfo | Function): Promise<void> {
-    let info: FactoryInfo;
-    if (factoryInfo instanceof Function) {
-      info = {factoryFn: factoryInfo};
-    } else {
-      info = factoryInfo;
+  public async registerFactory(...factoryInfo: FactoryParam[]): Promise<void> {
+    for (let factory of factoryInfo) {
+      let info: FactoryInfo;
+      if (factory instanceof Function) {
+        info = {factoryFn: factory};
+      } else {
+        info = factory;
+      }
+      await this._dependencyManager.factory(info);
     }
-    await this._dependencyManager.factory(info);
   }
 
   /**
@@ -121,13 +93,13 @@ export class NodeBootApplication implements ApplicationManager {
     await this._dependencyManager.value(name, value);
   }
 
-  public useModule(...module: ApplicationModule[]): this {
+  public usingModule(...module: ApplicationModule[]): this {
     [...module].forEach(m => this._applicationModules.add(m));
     return this;
   }
 
 
-  // Kept for compatibility
+  // @deprecated - Kept for compatibility
   public async bootstrap(): Promise<any> {
     return this.run();
   }
@@ -138,24 +110,55 @@ export class NodeBootApplication implements ApplicationManager {
    *
    * @return Returns the instance of the main application class.
    */
-  public async run(): Promise<any> {
+  public async run(): Promise<ApplicationContext> {
     if (this._mainApplicationInstance) {
       return this._mainApplicationInstance;
     }
 
-    for (let module of this._applicationModules) {
-      await module.initialize(this);
-    }
+    await this.initializeModules();
 
     await this.registerService({classz: this._mainApplicationClass, name: '$__main'});
 
-    let classes: ClassInfo[] = [...await this._classProviderManager.provideClasses(), ...this._registeredClasses];
-    await this._classProcessorManager.processClasses(classes);
+    await this.loadAndProcessClasses();
 
-    let mainApplication = await this._dependencyManager.findOne('$__main');
-    await this._classProcessorManager.triggerApplicationLoaded();
+    this._mainApplicationInstance = await this.initializeApplication();
+    await this.triggerApplicationLoadedEvent();
 
-    this._mainApplicationInstance = mainApplication;
-    return this._mainApplicationInstance;
+    return {
+      applicationConfig: this._applicationConfig,
+      dependencyManager: this._dependencyManager,
+      mainApplicationInstance: this._mainApplicationInstance
+    };
+  }
+
+  private async initializeApplication(): Promise<void> {
+    return await this._dependencyManager.findOne('$__main');
+  }
+
+  private async loadAndProcessClasses(): Promise<void> {
+    let classes: ClassInfo[] = [...this._registeredClasses];
+    for (let module of this._applicationModules) {
+      classes.push(...(await module.provideClasses() || []));
+    }
+    for (let module of this._applicationModules) {
+      await module.processClasses(classes);
+    }
+  }
+
+  private async initializeModules(): Promise<void> {
+    let moduleContext: ModuleContext = {
+      applicationConfig: this._applicationConfig,
+      dependencyManager: this._dependencyManager,
+      mainApplicationClass: this._mainApplicationClass
+    };
+    for (let module of this._applicationModules) {
+      await module.initialize(moduleContext);
+    }
+  }
+
+  private async triggerApplicationLoadedEvent(): Promise<void> {
+    for (let module of this._applicationModules) {
+      await module.applicationLoaded();
+    }
   }
 }

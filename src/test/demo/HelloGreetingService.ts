@@ -1,8 +1,8 @@
 import {GreetingService} from "./GreetingService";
-import {Service} from "../../main/di/service/ServiceAnnotation";
+import {Injectable} from "../../main/di/injectable/InjectableAnnotation";
 
-@Service
-export class HelloGreetingService extends GreetingService {
+@Injectable(GreetingService)
+export class HelloGreetingService implements GreetingService {
   public greet(name): string {
     return `Hello ${name}!`;
   }

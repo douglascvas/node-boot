@@ -4,7 +4,7 @@ import {LoggerFactory} from "../logging/LoggerFactory";
 import {ConsoleLoggerFactory} from "../logging/ConsoleLoggerFactory";
 import {ObjectUtils} from "../ObjectUtils";
 import {Unit} from "./Unit";
-import {ServiceInfo} from "./service/ServiceInfo";
+import {InjectableInfo} from "./injectable/InjectableInfo";
 import {FactoryInfo} from "./factory/FactoryInfo";
 import {ObjectFactory} from "../core/ObjectFactory";
 import {ClassType} from "../ClassType";
@@ -13,6 +13,7 @@ export class DefaultDependencyManager implements DependencyManager {
   private _translationMap: Map<string, string>;
   private _logger;
   private _units: Map<string, Unit>;
+  private _referencedBy: Map<string, Set<Unit>>;
   private _objectFactory: ObjectFactory;
 
   constructor(options: DefaultDependencyManagerOptions) {
@@ -20,12 +21,13 @@ export class DefaultDependencyManager implements DependencyManager {
     this._logger = loggerFactory.getLogger(DefaultDependencyManager);
     this._translationMap = new Map();
     this._units = new Map();
+    this._referencedBy = new Map<string, Set<Unit>>();
     this._objectFactory = options.objectFactory || new ObjectFactory();
     this.value('dependencyManager', this);
   }
 
   /**
-   * Defines a static value that will be used by the dependency management to inject in the
+   * Defines a static registerValue that will be used by the dependency management to inject in the
    * classes that has `name` as dependency.
    *
    * @param name {string} Name of the dependency.
@@ -36,11 +38,11 @@ export class DefaultDependencyManager implements DependencyManager {
     this.registerStaticUnit(name, value);
   }
 
-  public async service(serviceInfo: ServiceInfo): Promise<void> {
-    let name = this.extractInstanceName(serviceInfo.name || serviceInfo.classz);
-    let dependencies = serviceInfo.dependencies || ObjectUtils.extractArgs(serviceInfo.classz);
+  public async injectable(injectableInfo: InjectableInfo): Promise<void> {
+    let name = this.extractInstanceName(injectableInfo.name || injectableInfo.classz);
+    let dependencies = injectableInfo.dependencies || ObjectUtils.extractArgs(injectableInfo.classz);
 
-    this.registerServiceUnit(name, serviceInfo.classz, dependencies);
+    this.registerInjectableUnit(name, injectableInfo.classz, dependencies);
   }
 
   public async factory(factoryInfo: FactoryInfo): Promise<void> {
@@ -69,7 +71,7 @@ export class DefaultDependencyManager implements DependencyManager {
 
     if (!resolved) {
       for (let missingUnit of notRegistered) {
-        this._logger.error(`The depencency ${missingUnit.name} declared in ${Array.from(missingUnit.referencedBy).join(', ')} 
+        this._logger.error(`The depencency ${missingUnit.name} declared in ${Array.from(this._referencedBy[missingUnit.name]).join(', ')} 
         could not be found. Make sure you've registered it.`);
       }
       throw new Error(`The dependency could not be resolved: ${unit.name}.`)
@@ -81,11 +83,12 @@ export class DefaultDependencyManager implements DependencyManager {
   private registerStaticUnit(name: string, value: Function): Unit {
     let unit: Unit = this.getOrCreateUnit(name);
     unit.instanceValue = value;
+    unit.registered = true;
     unit.resolved = true;
     return unit;
   }
 
-  private registerServiceUnit(name: string,
+  private registerInjectableUnit(name: string,
                               classz: ClassType,
                               dependencies: (string | Function)[],
                               instanceFrom?: string): Unit {
@@ -114,7 +117,7 @@ export class DefaultDependencyManager implements DependencyManager {
     if (factoryContext) {
       let factoryContextName = this.extractInstanceName(factoryContext);
       unit.factoryContext = this.getOrCreateUnit(factoryContextName);
-      unit.factoryContext.referencedBy.add(unit);
+      this.addUnitReference(unit.factoryContext.name, unit);
     }
 
     unit.registered = true;
@@ -147,9 +150,19 @@ export class DefaultDependencyManager implements DependencyManager {
     for (let dependency of dependencies) {
       let dependencyName = this.extractInstanceName(dependency);
       let dependencyUnit = this.getOrCreateUnit(dependencyName);
-      dependencyUnit.referencedBy.add(unit);
+
+      this.addUnitReference(dependencyName, unit);
+
       unit.dependencies.add(dependencyUnit);
     }
+  }
+
+  private addUnitReference(dependencyName, unit: Unit) {
+    let references: Set<Unit> = this._referencedBy[dependencyName];
+    if (!references) {
+      references = this._referencedBy[dependencyName] = new Set();
+    }
+    references.add(unit);
   }
 
   private async resolveUnit(unit: Unit, notRegistered: Set<Unit>, unresolved?: Set<Unit>): Promise<boolean> {
@@ -205,7 +218,7 @@ export class DefaultDependencyManager implements DependencyManager {
       if (!context) {
         this._logger.warn(`No context defined for factory ${unit.name}. 
         You will not be able to reference "this" object in the factory function. Be sure you annotate the class containing the 
-        factory method with @Service.`);
+        factory method with @Injectable or @Configuration.`);
       }
       unit.instanceValue = await unit.factory.apply(context, dependencyValues);
     } else {

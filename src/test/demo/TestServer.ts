@@ -1,11 +1,17 @@
 import {GreetingService} from "./GreetingService";
 import {TestCalculationService} from "./TestCalculationService";
+import {Factory} from "../..";
+import * as express from "express";
 
 export class TestServer {
 
-  constructor(public app: any,
-              private _greetingService: GreetingService,
-              private testCalculationService: TestCalculationService) {
+  constructor(private _greetingService: GreetingService,
+              private _calculationService: TestCalculationService) {
+  }
+
+  @Factory({name: 'app'})
+  public createExpressApp(): any{
+    return express();
   }
 
   public greet(name) {
@@ -13,6 +19,6 @@ export class TestServer {
   }
 
   public sum(value1: number, value2: number): Promise<number> {
-    return this.testCalculationService.sum(value1, value2);
+    return this._calculationService.sum(value1, value2);
   }
 }

@@ -1,0 +1,2 @@
+- Main class is registered under key `$__main`
+- Added support for [interfaces](../Interfaces.md)

@@ -6,7 +6,6 @@ export class Unit {
   public classz: ClassType;
 
   public instanceValue: any;
-  public referencedBy: Set<Unit>;
   public dependencies: Set<Unit>;
   public factory: Function;
   public factoryContext: Unit;
@@ -17,7 +16,6 @@ export class Unit {
 
   constructor(name: string) {
     this.name = name;
-    this.referencedBy = new Set();
     this.resolved = false;
     this.registered = false;
     this.dependencies = new Set();

@@ -18,12 +18,16 @@ export abstract class Annotation extends JsObject {
     classMetadata.addAnnotation(this);
   }
 
-  protected annotateMethod(targetMethod: Function, targetClass: ClassType) {
+  /**
+   * This method should be called before anything else, because it will proxy the original method
+   * and replace the methodDescriptor.value.
+   */
+  protected annotateMethod(methodDescriptor: TypedPropertyDescriptor<Function>, targetClass: ClassType) {
     if (this._metadata) {
       return;
     }
     let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(targetClass);
-    let methodMetadata: MethodMetadata = classMetadata.getOrCreateMethodMetadata(targetMethod);
+    let methodMetadata: MethodMetadata = classMetadata.getOrCreateMethodMetadata(methodDescriptor);
     this._metadata = methodMetadata;
     methodMetadata.addAnnotation(this);
   }

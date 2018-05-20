@@ -117,4 +117,8 @@ export class ObjectUtils {
     }
     return result;
   }
+
+  public isInterface(){
+
+  }
 }

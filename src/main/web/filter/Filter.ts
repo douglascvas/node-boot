@@ -1,9 +1,9 @@
 import "reflect-metadata";
 import {FilterInfo} from "./FilterInfo";
 import {FilterOptions} from "./FilterOptions";
-import {ServiceAnnotation} from "../../di/service/ServiceAnnotation";
 import {Annotation} from "../../core/Annotation";
 import {ClassType} from "../../ClassType";
+import {InjectableAnnotation} from "../../di/injectable/InjectableAnnotation";
 
 const filtersMetadataKey = Symbol("filtersMD");
 
@@ -60,10 +60,9 @@ export class FilterAnnotation extends Annotation {
     this.filterInfo = {
       name: filterOptions.name,
       dependencies: filterOptions.dependencies,
-      skipParentRegistration: filterOptions.skipParentRegistration,
       classz: classz
     };
-    new ServiceAnnotation(filterOptions, classz);
+    new InjectableAnnotation(filterOptions, classz);
     this.annotateClass(classz);
   }
 }

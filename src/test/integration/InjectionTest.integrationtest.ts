@@ -13,7 +13,7 @@ describe('Injection test', function () {
 
   before(async () => {
     testApplication = new TestApplication();
-    server = await testApplication.start();
+    server = (await testApplication.start()).mainApplicationInstance;
   });
 
   it('should inject HelloGreetingService in the Server when declared by "interface" name', async () => {

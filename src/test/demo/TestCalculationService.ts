@@ -1,8 +1,8 @@
 import {CalculationService} from "./CalculationService";
-import {Service} from "../../main/di/service/ServiceAnnotation";
+import {Injectable} from "../../main/di/injectable/InjectableAnnotation";
 
-@Service
-export class TestCalculationService extends CalculationService {
+@Injectable(CalculationService)
+export class TestCalculationService implements CalculationService {
   public async sum(value1: number, value2: number): Promise<number> {
     return value1 + value2;
   }

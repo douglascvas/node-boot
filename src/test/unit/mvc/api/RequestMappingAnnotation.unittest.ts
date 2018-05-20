@@ -36,12 +36,12 @@ describe('RequestMappingAnnotation', function () {
 
   class TestClass {
     @RequestMapping({uri: '/anyPostApi', type: RequestType.POST})
-    public postApi() {
+    public postApi(req, res) {
       return 1;
     }
 
     @RequestMapping({uri: '/anyGetApi', type: RequestType.GET})
-    public getApi() {
+    public getApi(req, res) {
       return 2;
     }
   }

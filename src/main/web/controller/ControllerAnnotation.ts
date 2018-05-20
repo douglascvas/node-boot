@@ -1,9 +1,8 @@
 import "reflect-metadata";
 import {ControllerInfo} from "./ControllerInfo";
 import {ControllerOptions} from "./ControllerOptions";
-import {ServiceAnnotation} from "../../di/service/ServiceAnnotation";
 import {ClassType} from "../../ClassType";
-import {Annotation} from "../../core/Annotation";
+import {InjectableAnnotation} from "../../di/injectable/InjectableAnnotation";
 
 /**
  * Declares a class that will handle HTTP requests.
@@ -46,17 +45,16 @@ export function Controller(options: ControllerOptions | Function): any {
 }
 
 
-export class ControllerAnnotation extends Annotation {
+export class ControllerAnnotation extends InjectableAnnotation {
   public readonly controllerInfo: ControllerInfo;
 
   constructor(options: ControllerOptions, targetClass: ClassType) {
-    super();
+    super(options, targetClass);
     this.controllerInfo = {
       name: options.name,
       uri: options.uri,
       classz: targetClass
     };
-    new ServiceAnnotation(options, targetClass);
     this.annotateClass(targetClass);
   }
 }

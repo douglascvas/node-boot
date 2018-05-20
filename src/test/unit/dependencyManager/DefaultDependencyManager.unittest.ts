@@ -21,8 +21,8 @@ describe('DefaultDependencyManager', function () {
     dependencyManager = new DefaultDependencyManager({loggerFactory});
   });
 
-  describe('#value', function () {
-    it('should register a value', async function () {
+  describe('#registerValue', function () {
+    it('should register a registerValue', async function () {
       // given
       let value = 123;
       await dependencyManager.value("test", value);
@@ -35,10 +35,10 @@ describe('DefaultDependencyManager', function () {
     });
   });
 
-  describe('#service', function () {
-    it('should register a service extracting name from class', async function () {
+  describe('#injectable', function () {
+    it('should register a injectable extracting name from class', async function () {
       // given
-      await dependencyManager.service({classz: Foo});
+      await dependencyManager.injectable({classz: Foo});
 
       // when
       let foo: any = await dependencyManager.findOne('foo');
@@ -48,9 +48,9 @@ describe('DefaultDependencyManager', function () {
       assert.equal(foo.id, FOO_ID);
     });
 
-    it('should register a service with given name', async function () {
+    it('should register a injectable with given name', async function () {
       // given
-      await dependencyManager.service({classz: Foo, name: 'customFooName'});
+      await dependencyManager.injectable({classz: Foo, name: 'customFooName'});
 
       // when
       let foo: any = await dependencyManager.findOne('customFooName');
@@ -64,10 +64,10 @@ describe('DefaultDependencyManager', function () {
       assert.isFalse(!!foo);
     });
 
-    it('should register a service with a dependency', async function () {
+    it('should register a injectable with a dependency', async function () {
       // given
-      await dependencyManager.service({classz: Foo});
-      await dependencyManager.service({classz: Bar});
+      await dependencyManager.injectable({classz: Foo});
+      await dependencyManager.injectable({classz: Bar});
 
       // when
       let bar: any = await dependencyManager.findOne('bar');
@@ -79,10 +79,10 @@ describe('DefaultDependencyManager', function () {
       assert.equal(bar.foo.id, FOO_ID);
     });
 
-    it('should register a service with a dependency registered after it', async function () {
+    it('should register a injectable with a dependency registered after it', async function () {
       // given
-      await dependencyManager.service({classz: Bar});
-      await dependencyManager.service({classz: Foo});
+      await dependencyManager.injectable({classz: Bar});
+      await dependencyManager.injectable({classz: Foo});
 
       // when
       let bar: any = await dependencyManager.findOne('bar');
@@ -98,7 +98,7 @@ describe('DefaultDependencyManager', function () {
   describe('#factory', function () {
     it('should register a factory by extracting the name from the factory function', async function () {
       // given
-      await dependencyManager.service({classz: Rocket});
+      await dependencyManager.injectable({classz: Rocket});
       await dependencyManager.factory({factoryFn: specialFooFn});
 
       // when
@@ -110,7 +110,7 @@ describe('DefaultDependencyManager', function () {
 
     it('should register a factory by extracting the name from the class given on factory name parameter', async function () {
       // given
-      await dependencyManager.service({classz: Rocket});
+      await dependencyManager.injectable({classz: Rocket});
       await dependencyManager.factory({factoryFn: specialFooFn, context: SpecialFoo});
 
       // when
@@ -128,7 +128,7 @@ describe('DefaultDependencyManager', function () {
         result.rocket.id = "space rocket";
         return result;
       };
-      await dependencyManager.service({classz: Rocket});
+      await dependencyManager.injectable({classz: Rocket});
       await dependencyManager.factory({factoryFn: factoryFn, name: 'customFoo'});
 
       // when
@@ -150,7 +150,7 @@ describe('DefaultDependencyManager', function () {
         return result;
       };
       await dependencyManager.factory({factoryFn: factoryTestFn, context: Foo});
-      await dependencyManager.service({classz: Rocket});
+      await dependencyManager.injectable({classz: Rocket});
 
       // when
       let foo: any = await dependencyManager.findOne('factoryTestFn');
@@ -165,8 +165,8 @@ describe('DefaultDependencyManager', function () {
     it('should register a factory setting the right context registered by name', async function () {
       // given
       await dependencyManager.factory({factoryFn: Rocket.prototype.factoryFn, name: 'planet', context: 'rocket'});
-      await dependencyManager.service({classz: Rocket});
-      await dependencyManager.service({classz: Foo});
+      await dependencyManager.injectable({classz: Rocket});
+      await dependencyManager.injectable({classz: Foo});
 
       // when
       let planet: any = await dependencyManager.findOne('planet');
@@ -180,8 +180,8 @@ describe('DefaultDependencyManager', function () {
     it('should register a factory setting the right context registered by class', async function () {
       // given
       await dependencyManager.factory({factoryFn: Rocket.prototype.factoryFn, name: 'planet', context: Rocket});
-      await dependencyManager.service({classz: Rocket});
-      await dependencyManager.service({classz: Foo});
+      await dependencyManager.injectable({classz: Rocket});
+      await dependencyManager.injectable({classz: Foo});
 
       // when
       let planet: any = await dependencyManager.findOne('planet');

@@ -49,7 +49,7 @@ export class PaymentController {
   }
   
   // define a REST api - this will be automatically registered on your REST framework, i.e. expressJs
-  // the ResponseBody annotation will take care of the returned value, setting it into the response
+  registerValue
   @ResponseBody
   @RequestMapping('/pay', RequestType.POST, filters: [BigPaymentFilter])
   public async paymentApi(request, response): Promise<Payment> {
@@ -93,7 +93,7 @@ To see other example how to use it, see the `TestApplication.ts` demo applicatio
 
 ## Which annotations are available?
 
-### @Service
+### @Injectable
 
 Declares a class to be automatically instantiated by node-boot and available for injection.
 That means that all the constructor arguments will also be resolved automatically by the injector.
@@ -101,13 +101,13 @@ That means that all the constructor arguments will also be resolved automaticall
 In the example above, bookingService will be instantiated automatically and passed as parameter to the paymentController, that will also be instantiated automatically.
 
 Syntax:
-`@Service(string | FilterOptions)`
+`@Injectable(string | FilterOptions)`
 
 If the parameter is a string, it will be used as the API URI.
 
 If no parameter is given, or no name is given, the name will be extracted from the class name. So:
 ```typescript
-@Service
+@Injectable
 class MyService {
 }
 ```
@@ -140,7 +140,7 @@ You can also use parameters in your factory function. Any parameter declared wil
 
 ### @Controller
 
-This annotation extends the `@Service` annotation, what means that the annotated class will be registered as a service.
+This annotation extends the `@Injectable` annotation, what means that the annotated class will be registered as a service.
 You **must** use this annotation in classes where you have REST endpoints to be managed by node-boot.
 
 For the available annotation parameters see the ControllerOptions interface.
@@ -158,7 +158,7 @@ will be registered as `myController`.
 
 ### @Filter
 
-This annotation extends the `@Service` annotation, what means that the annotated class will be registered as a service.
+This annotation extends the `@Injectable` annotation, what means that the annotated class will be registered as a service.
 Use this annotation for defining classes whose `filter` function will be used as a middleware to those APIs that reference this filter.
 The annotated class **must** implement the `BasicFilter` interface.
 
@@ -272,20 +272,5 @@ Do you want to contribute? Please open an issue or send a pull request... let's 
 
 
 
-## Changelog
-
-**2.0**:
-- <sup>Major rewrite of code.</sup> 
-- <sup>Created support for plugins (class processors and class providers).</sup> 
-- <sup>Classes are instantiated now using builder pattern.</sup> 
-- <sup>Created support for filters.</sup> 
-- <sup>Changed signature for ApplicationManager</sup> 
-- <sup>All classes are now built with Builder pattern.</sup> 
-- <sup>WebManager became an interface, which is implemented by ExpressWebManager</sup> 
-- <sup>Changed signature of methods in DependencyManager.</sup> 
-- <sup>Changed signature of methods in ApplicationManager.</sup> 
-- <sup>Removed @AutoScan in favor of configuring directly when building ApplicationManager.</sup>
-- <sup>Some minor fixes.</sup> 
-- <sup>Adjusted documentation accordingly.</sup>
 
 

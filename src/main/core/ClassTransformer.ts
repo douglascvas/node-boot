@@ -1,5 +1,5 @@
-// import {ObjectUtils} from "../ObjectUtils";
 // import {MethodMetadata} from "./MethodMetadata";
+// import {ClassMetadata} from "./ClassMetadata";
 //
 // export class ClassTransformer {
 //   public transformClass(classz: Function): Function {
@@ -13,8 +13,9 @@
 //       construct: function (target, args) {
 //         return new Proxy(Reflect.construct(target, args), this);
 //       },
-//       apply: async function (originalMethod, thisArg, argumentsList) {
-//         let metadata: MethodMetadata = ObjectUtils.getOrCreateMethodMetadata(originalMethod);
+//       apply: async function (originalMethod: Function, thisArg, argumentsList) {
+//         let classMetadata = ClassMetadata.getOrCreateClassMetadata(thisArg);
+//         let metadata: MethodMetadata = classMetadata.getOrCreateMethodMetadata(originalMethod);
 //         await metadata.triggerMethodCall(originalMethod, thisArg, argumentsList);
 //       }
 //     });

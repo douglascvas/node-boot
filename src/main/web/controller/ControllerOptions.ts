@@ -1,5 +1,5 @@
-import {ServiceOptions} from "../../di/service/ServiceOptions";
+import {InjectableOptions} from "../../di/injectable/InjectableOptions";
 
-export interface ControllerOptions extends ServiceOptions {
+export interface ControllerOptions extends InjectableOptions {
   uri?: string
 }

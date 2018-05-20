@@ -1,59 +1,57 @@
 'use strict';
 
 import * as Sinon from "sinon";
-import {ServiceAnnotationClassProcessor} from "../../../../main/di/service/ServiceAnnotationClassProcessor";
+import {InjectableAnnotationClassProcessor} from "../../../../main/di/injectable/InjectableAnnotationClassProcessor";
 import {DependencyManager} from "../../../../main/di/DependencyManager";
 import {LoggerFactory} from "../../../../main/logging/LoggerFactory";
 import {DefaultDependencyManager} from "../../../../main/di/DefaultDependencyManager";
 import {TestLoggerFactory} from "../../TestLoggerFactory";
-import {Service} from "../../../../main/di/service/ServiceAnnotation";
+import {Injectable} from "../../../../main/di/injectable/InjectableAnnotation";
 import SinonStub = Sinon.SinonStub;
 
 describe('ServiceAnnotationClassProcessor', function () {
 
-  let serviceAnnotationClassProcessor: ServiceAnnotationClassProcessor,
+  let serviceAnnotationClassProcessor: InjectableAnnotationClassProcessor,
     dependencyManager: DependencyManager,
     loggerFactory: LoggerFactory;
 
   beforeEach(() => {
     dependencyManager = Sinon.createStubInstance(DefaultDependencyManager);
     loggerFactory = new TestLoggerFactory();
-    serviceAnnotationClassProcessor = new ServiceAnnotationClassProcessor({dependencyManager, loggerFactory});
+    serviceAnnotationClassProcessor = new InjectableAnnotationClassProcessor({dependencyManager, loggerFactory});
   });
 
   describe('#onRegisterClass()', function () {
-    it('should register class annotated with @Service, without args', async function () {
+    it('should register class annotated with @Injectable, without args', async function () {
       // when
       await serviceAnnotationClassProcessor.processClass(TestClass);
 
       // then
-      Sinon.assert.calledWith(<SinonStub>dependencyManager.service, {
+      Sinon.assert.calledWith(<SinonStub>dependencyManager.injectable, {
         classz: TestClass,
         dependencies: null,
         name: null,
-        skipParentRegistration: null
       });
     });
 
-    it('should register class annotated with @Service, with args', async function () {
+    it('should register class annotated with @Injectable, with args', async function () {
       // when
       await serviceAnnotationClassProcessor.processClass(TestClassWithName);
 
       // then
-      Sinon.assert.calledWith(<SinonStub>dependencyManager.service, {
+      Sinon.assert.calledWith(<SinonStub>dependencyManager.injectable, {
         classz: TestClassWithName,
         dependencies: null,
         name: 'namedClass',
-        skipParentRegistration: null
       });
     });
   });
 
-  @Service
+  @Injectable
   class TestClass {
   }
 
-  @Service('namedClass')
+  @Injectable('namedClass')
   class TestClassWithName {
   }
 });

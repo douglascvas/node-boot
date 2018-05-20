@@ -1,8 +1,9 @@
 import {ApplicationModule} from "../ApplicationModule";
 import {RequiresAuthenticationClassProcessor} from "./security/RequiresAuthenticationClassProcessor";
 import {LoggerFactory} from "../logging/LoggerFactory";
-import {ApplicationManager} from "../ApplicationManager";
 import {ConsoleLoggerFactory} from "../logging/ConsoleLoggerFactory";
+import {ClassInfo} from "../ClassInfo";
+import {ModuleContext} from "../ModuleContext";
 
 export class WebModule implements ApplicationModule {
   protected _requiresAuthenticationClassProcessor: RequiresAuthenticationClassProcessor;
@@ -14,8 +15,21 @@ export class WebModule implements ApplicationModule {
       new RequiresAuthenticationClassProcessor({loggerFactory: this._loggerFactory});
   }
 
-  public async initialize(application: ApplicationManager): Promise<void> {
-    application.registerClassProcessor(this._requiresAuthenticationClassProcessor);
+  public async initialize(application: ModuleContext): Promise<void> {
+  }
+
+  public async applicationLoaded(): Promise<void> {
+    await this._requiresAuthenticationClassProcessor.onApplicationLoad();
+  }
+
+  public async processClasses(classes: ClassInfo[]): Promise<void> {
+    for (let classInfo of classes) {
+      await this._requiresAuthenticationClassProcessor.processClass(classInfo.classz);
+    }
+  }
+
+  public async provideClasses(): Promise<ClassInfo[]> {
+    return [];
   }
 }
 

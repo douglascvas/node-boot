@@ -8,29 +8,17 @@ import {Annotation} from "./Annotation";
 const CLASS_METADATA_KEY = Symbol('ClassMetadata');
 
 export class ClassMetadata extends Metadata {
-  /**
-   * @key: annotation name
-   * @value: annotation
-   */
-  private _classAnnotationsMap: Map<string, Annotation>;
-  /**
-   * @key: annotation name
-   * @value: annotation
-   */
-  private _methodAnnotationsMap: Map<string, Annotation[]>;
-  /**
-   * @key: method name
-   * @value: method metadata
-   */
-  private _methodNameToMethodMetadataMap: Map<string, MethodMetadata>;
+  private _classAnnotationFromAnnotationName: Map<string, Annotation>;
+  private _methodAnnotationsFromAnnotationName: Map<string, Annotation[]>;
+  private _methodMetadataFromMethodName: Map<string, MethodMetadata>;
   private _constructObserver: ChainedMethodCallObserver;
 
   private constructor(targetClass: ClassType) {
     super(targetClass);
     this._constructObserver = new ChainedMethodCallObserver();
-    this._classAnnotationsMap = new Map();
-    this._methodAnnotationsMap = new Map();
-    this._methodNameToMethodMetadataMap = new Map();
+    this._classAnnotationFromAnnotationName = new Map();
+    this._methodAnnotationsFromAnnotationName = new Map();
+    this._methodMetadataFromMethodName = new Map();
   }
 
   public static getOrCreateClassMetadata(target: ClassType) {
@@ -42,28 +30,36 @@ export class ClassMetadata extends Metadata {
     return classMeta;
   }
 
-  public getOrCreateMethodMetadata(method: Function) {
-    let methodMetadata: MethodMetadata = this._methodNameToMethodMetadataMap.get(method.name);
+  public getOrCreateMethodMetadata(methodDescriptor: TypedPropertyDescriptor<Function>) {
+    let methodMetadata: MethodMetadata = this._methodMetadataFromMethodName.get(methodDescriptor.value.name);
     if (!methodMetadata) {
-      methodMetadata = new MethodMetadata(method, this);
+      let handler = {
+        apply: function(target, thisArg, argumentsList) {
+          methodMetadata.triggerMethodCall(target, thisArg, argumentsList);
+        }
+      };
+      let proxy = new Proxy(methodDescriptor.value, handler);
+      methodDescriptor.value = proxy;
+
+      methodMetadata = new MethodMetadata(proxy, this);
       methodMetadata.onAddAnnotation(annotation => this.addMethodAnnotation(annotation));
-      this._methodNameToMethodMetadataMap.set(method.name, methodMetadata);
+      this._methodMetadataFromMethodName.set(proxy.name, methodMetadata);
     }
     return methodMetadata;
   }
 
   public addAnnotation(annotation: Annotation) {
-    if (!this._classAnnotationsMap.has(annotation.className)) {
-      this._classAnnotationsMap.set(annotation.className, annotation);
+    if (!this._classAnnotationFromAnnotationName.has(annotation.className)) {
+      this._classAnnotationFromAnnotationName.set(annotation.className, annotation);
     }
   }
 
   public getClassAnnotation<T extends Annotation>(annotationName: string): T {
-    return <T>this._classAnnotationsMap.get(annotationName) || null;
+    return <T>this._classAnnotationFromAnnotationName.get(annotationName) || null;
   }
 
   public getMethodAnnotations<T extends Annotation>(annotationName: string): T[] {
-    return <T[]>this._methodAnnotationsMap.get(annotationName) || [];
+    return <T[]>this._methodAnnotationsFromAnnotationName.get(annotationName) || [];
   }
 
   public onClassConstruct(listener: MethodCallListener) {
@@ -75,14 +71,14 @@ export class ClassMetadata extends Metadata {
   }
 
   get classAnnotations(): Annotation[] {
-    return Array.from(this._classAnnotationsMap.values());
+    return Array.from(this._classAnnotationFromAnnotationName.values());
   }
 
   private addMethodAnnotation(annotation: Annotation): void {
-    let annotations: Annotation[] = this._methodAnnotationsMap.get(annotation.className);
+    let annotations: Annotation[] = this._methodAnnotationsFromAnnotationName.get(annotation.className);
     if (!annotations) {
       annotations = [];
-      this._methodAnnotationsMap.set(annotation.className, annotations);
+      this._methodAnnotationsFromAnnotationName.set(annotation.className, annotations);
     }
     annotations.push(annotation);
   }

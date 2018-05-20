@@ -7,6 +7,10 @@ import {RequiresAuthenticationAnnotation} from "./RequiresAuthentication";
 import {ClassMetadata} from "../../core/ClassMetadata";
 import {ClassType} from "../../ClassType";
 
+export interface RequiresAuthenticationClassProcessorOptions {
+    loggerFactory?: LoggerFactory;
+}
+
 export class RequiresAuthenticationClassProcessor implements ClassProcessor {
   private _logger: Logger;
 
@@ -32,8 +36,4 @@ export class RequiresAuthenticationClassProcessor implements ClassProcessor {
   public async onApplicationLoad(): Promise<void> {
   }
 
-}
-
-export interface RequiresAuthenticationClassProcessorOptions {
-  loggerFactory?: LoggerFactory;
 }

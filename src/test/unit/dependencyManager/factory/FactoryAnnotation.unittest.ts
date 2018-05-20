@@ -9,7 +9,7 @@ const assert = chai.assert;
 
 describe('FactoryAnnotation', function () {
 
-  it('should register factory with parameters', async function () {
+  it('should register registerFactory with parameters', async function () {
     // given
     let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
       .getMethodAnnotations(FactoryAnnotation.className)
@@ -22,7 +22,7 @@ describe('FactoryAnnotation', function () {
     assert.equal(factories[0].context, FactoryTest);
   });
 
-  it('should register factory without parameters', async function () {
+  it('should register registerFactory without parameters', async function () {
     // when
     let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
       .getMethodAnnotations(FactoryAnnotation.className)
@@ -35,7 +35,7 @@ describe('FactoryAnnotation', function () {
     assert.equal(factories[1].context, FactoryTest);
   });
 
-  it('should register factory with name as parameter', async function () {
+  it('should register registerFactory with name as parameter', async function () {
     // given
     let factories: FactoryInfo[] = ClassMetadata.getOrCreateClassMetadata(FactoryTest)
       .getMethodAnnotations(FactoryAnnotation.className)

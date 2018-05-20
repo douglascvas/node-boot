@@ -9,8 +9,10 @@ export function Factory(options: FactoryOptions | Object | string,
                         descriptor?: PropertyDescriptor) {
   let factoryOptions: FactoryOptions;
 
-  function defineFactory(target: Object, propertyKey: string, descriptor: PropertyDescriptor) {
-    new FactoryAnnotation(factoryOptions, <ClassType>target.constructor, descriptor.value);
+  function defineFactory(target: Object,
+                         propertyKey: string,
+                         descriptor: PropertyDescriptor): any {
+    new FactoryAnnotation(factoryOptions, <ClassType>target.constructor, descriptor);
   }
 
   // If not parameters where given we assume typescript passes the normal decorator parameters
@@ -20,8 +22,7 @@ export function Factory(options: FactoryOptions | Object | string,
       name: null,
       dependencies: null
     };
-    defineFactory(target, propertyKey, descriptor);
-    return;
+    return defineFactory(target, propertyKey, descriptor);
   }
 
   if (typeof options === 'string') {
@@ -36,14 +37,16 @@ export function Factory(options: FactoryOptions | Object | string,
 export class FactoryAnnotation extends Annotation {
   public readonly factoryInfo: FactoryInfo;
 
-  constructor(factoryOptions: FactoryOptions, classz: ClassType, method: Function) {
+  constructor(factoryOptions: FactoryOptions,
+              classz: ClassType,
+              descriptor: PropertyDescriptor) {
     super();
+    this.annotateMethod(descriptor, classz);
     this.factoryInfo = {
       name: factoryOptions.name,
-      factoryFn: method,
+      factoryFn: descriptor.value,
       dependencies: factoryOptions.dependencies,
       context: classz
     };
-    this.annotateMethod(method, classz);
   }
 }

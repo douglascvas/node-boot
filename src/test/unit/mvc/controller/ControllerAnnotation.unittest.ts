@@ -3,9 +3,9 @@
 import * as chai from "chai";
 import {Controller, ControllerAnnotation} from "../../../../main/web/controller/ControllerAnnotation";
 import {ControllerInfo} from "../../../../main/web/controller/ControllerInfo";
-import {ServiceInfo} from "../../../../main/di/service/ServiceInfo";
+import {InjectableInfo} from "../../../../main/di/injectable/InjectableInfo";
 import {ClassMetadata} from "../../../../main/core/ClassMetadata";
-import {ServiceAnnotation} from "../../../../main/di/service/ServiceAnnotation";
+import {InjectableAnnotation} from "../../../../main/di/injectable/InjectableAnnotation";
 
 const assert = chai.assert;
 
@@ -15,7 +15,7 @@ describe('@ControllerAnnotation', function () {
     // given
     let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(ControllerWithoutParameters);
     let controller: ControllerInfo = (<ControllerAnnotation>classMetadata.getClassAnnotation(ControllerAnnotation.className)).controllerInfo;
-    let service: ServiceInfo = (<ServiceAnnotation>classMetadata.getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
+    let service: InjectableInfo = (<InjectableAnnotation>classMetadata.getClassAnnotation(InjectableAnnotation.className)).injectableInfo;
 
     // then
     assert.equal(controller.name, null);
@@ -23,7 +23,6 @@ describe('@ControllerAnnotation', function () {
     assert.equal(controller.classz, ControllerWithoutParameters);
 
     assert.equal(service.name, null);
-    assert.equal(service.skipParentRegistration, null);
     assert.equal(service.classz, ControllerWithoutParameters);
   });
 
@@ -31,7 +30,7 @@ describe('@ControllerAnnotation', function () {
     // given
     let classMetadata: ClassMetadata = ClassMetadata.getOrCreateClassMetadata(ControllerWithParameters);
     let controller: ControllerInfo = (<ControllerAnnotation>classMetadata.getClassAnnotation(ControllerAnnotation.className)).controllerInfo;
-    let service: ServiceInfo = (<ServiceAnnotation>classMetadata.getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
+    let service: InjectableInfo = (<InjectableAnnotation>classMetadata.getClassAnnotation(InjectableAnnotation.className)).injectableInfo;
 
     // then
     assert.equal(controller.name, 'testController');
@@ -39,14 +38,13 @@ describe('@ControllerAnnotation', function () {
     assert.equal(controller.classz, ControllerWithParameters);
 
     assert.equal(service.name, 'testController');
-    assert.equal(service.skipParentRegistration, true);
     assert.equal(service.classz, ControllerWithParameters);
   });
 
-  it('should register @Service', async function () {
+  it('should register @Injectable', async function () {
     // given
-    let service: ServiceInfo = (<ServiceAnnotation>ClassMetadata.getOrCreateClassMetadata(ControllerWithParameters)
-      .getClassAnnotation(ServiceAnnotation.className)).serviceInfo;
+    let service: InjectableInfo = (<InjectableAnnotation>ClassMetadata.getOrCreateClassMetadata(ControllerWithParameters)
+      .getClassAnnotation(InjectableAnnotation.className)).injectableInfo;
 
     // then
     assert.equal(service.name, 'testController');
@@ -58,7 +56,7 @@ describe('@ControllerAnnotation', function () {
   class ControllerWithoutParameters {
   }
 
-  @Controller({name: 'testController', uri: '/base', skipParentRegistration: true, dependencies: ['dep1']})
+  @Controller({name: 'testController', uri: '/base', dependencies: ['dep1']})
   class ControllerWithParameters {
   }
 

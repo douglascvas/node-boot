@@ -96,7 +96,7 @@ describe('ExpressApiLoader', function () {
     }
 
     @RequestMapping({uri: '/newFilteredApi', type: RequestType.PUT, filters: [TestFilter]})
-    public async filteredFoo() {
+    public async filteredFoo(req, res) {
       return 2;
     }
   }

@@ -1,4 +1,4 @@
-import {ServiceInfo} from "../../di/service/ServiceInfo";
+import {InjectableInfo} from "../../di/injectable/InjectableInfo";
 
-export interface FilterInfo extends ServiceInfo {
+export interface FilterInfo extends InjectableInfo {
 }

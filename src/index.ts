@@ -28,14 +28,14 @@ export * from "./main/core/ClassProvider";
 
 export * from "./main/di/DefaultDependencyManager";
 export * from "./main/di/DependencyManager";
-export * from "./main/di/service/ServiceAnnotation";
-export * from "./main/di/service/ServiceInfo";
-export * from "./main/di/service/ServiceOptions";
+export * from "./main/di/injectable/ServiceAnnotation";
+export * from "./main/di/injectable/InjectableInfo";
+export * from "./main/di/injectable/InjectableOptions";
 export * from "./main/di/factory/FactoryAnnotation";
 export * from "./main/di/factory/FactoryInfo";
 export * from "./main/di/factory/FactoryOptions";
 export * from "./main/di/factory/FactoryAnnotationClassProcessor";
-export * from "./main/di/service/ServiceAnnotationClassProcessor";
+export * from "./main/di/injectable/InjectableAnnotationClassProcessor";
 
 export * from "./main/logging/Logger";
 export * from "./main/logging/LoggerFactory";

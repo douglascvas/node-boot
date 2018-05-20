@@ -1,8 +1,7 @@
 import {ClassType} from "../../ClassType";
 
-export interface ServiceInfo {
+export interface InjectableInfo {
   classz: ClassType;
   name?: string;
-  skipParentRegistration?: boolean;
   dependencies?: (string | Function)[];
 }
