@@ -1,5 +1,3 @@
-import {InjectableInterface} from "../../main/core/InjectableInterface";
-
-export abstract class GreetingService extends InjectableInterface {
+export abstract class GreetingService {
   abstract greet(name): string;
 }

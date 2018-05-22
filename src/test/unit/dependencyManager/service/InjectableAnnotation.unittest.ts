@@ -56,8 +56,8 @@ describe('InjectableAnnotation', function () {
   class Dep2 {
   }
 
-  @InjectableInterface
   abstract class AbstractService {
+    abstract a();
   }
 
   @Injectable({name: 'testService', dependencies: ['dep1', Dep2]})
@@ -68,8 +68,10 @@ describe('InjectableAnnotation', function () {
   class ServiceWithoutParameters {
   }
 
-  @Injectable(AbstractService)
+  @Injectable({nameFrom: AbstractService})
   class ServiceWithInterface implements AbstractService {
+    a() {
+    }
   }
 
   @Injectable('namedService')

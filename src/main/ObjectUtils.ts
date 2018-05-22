@@ -7,7 +7,7 @@ const METADATA_KEY_PREFIX = '::node-boot:';
 const METHOD_METADATA_KEY = `${METADATA_KEY_PREFIX}:method`;
 
 export class ObjectUtils {
-  public static * toIterable(value) {
+  public static* toIterable(value) {
     if (value instanceof Array) {
       for (let i = 0; i < value.length; i++) {
         yield value[i];
@@ -23,6 +23,9 @@ export class ObjectUtils {
   }
 
   public static extractClassName(classz: Function): string {
+    if (!classz) {
+      return null;
+    }
     let asString = classz.toString();
     if (asString === '[object]') {
       asString = classz.constructor.toString();
@@ -118,7 +121,7 @@ export class ObjectUtils {
     return result;
   }
 
-  public isInterface(){
+  public isInterface() {
 
   }
 }
