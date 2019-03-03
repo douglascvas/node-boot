@@ -1,3 +1,8 @@
+<H1 style="color: red">!!! DEPRECATED !!!</H1>
+This project is no longer maintained.
+
+
+
 ## What is node-boot?
 
 Node Boot is a framework for dependency injection (IoC) and REST management. 
@@ -266,26 +271,5 @@ npm install node-boot --save
 * Add error handler support
 * Add authentication/authorization mechanism
 
-
-## Contribute 
-Do you want to contribute? Please open an issue or send a pull request... let's make it great!
-
-
-
-## Changelog
-
-**2.0**:
-- <sup>Major rewrite of code.</sup> 
-- <sup>Created support for plugins (class processors and class providers).</sup> 
-- <sup>Classes are instantiated now using builder pattern.</sup> 
-- <sup>Created support for filters.</sup> 
-- <sup>Changed signature for ApplicationManager</sup> 
-- <sup>All classes are now built with Builder pattern.</sup> 
-- <sup>WebManager became an interface, which is implemented by ExpressWebManager</sup> 
-- <sup>Changed signature of methods in DependencyManager.</sup> 
-- <sup>Changed signature of methods in ApplicationManager.</sup> 
-- <sup>Removed @AutoScan in favor of configuring directly when building ApplicationManager.</sup>
-- <sup>Some minor fixes.</sup> 
-- <sup>Adjusted documentation accordingly.</sup>
 
 
